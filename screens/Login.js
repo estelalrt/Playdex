@@ -24,7 +24,7 @@ export default function Login() {
     }
     try {
       const url =
-        "https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/login";
+        "https://playdex-yh18.onrender.com/login";
       const resposta = await fetch(url, {
         method: "POST",
         headers: {

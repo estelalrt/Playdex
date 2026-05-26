@@ -32,7 +32,7 @@ export default function Atividade() {
       return;
     }
     try {
-      const url = `https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/jogos/busca?q=${texto}`;
+      const url = `https://playdex-yh18.onrender.com/jogos/busca?q=${texto}`;
       const resposta = await fetch(url, {
         headers: {
           Accept: "application/json",

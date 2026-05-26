@@ -31,7 +31,7 @@ export default function Perfil() {
 
   // URL BASE DO BACKEND
   const URL_BASE =
-    "https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev";
+    "https://playdex-yh18.onrender.com";
 
   // 1. CARREGAR TUDO AO ABRIR A TELA
   useEffect(() => {

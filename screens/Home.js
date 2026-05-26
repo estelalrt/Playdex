@@ -20,7 +20,7 @@ export default function Home() {
         const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
         if (!usuarioSalvo) return;
 
-        const url = `https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/feed/${usuarioSalvo}`;
+        const url = `https://playdex-yh18.onrender.com/feed/${usuarioSalvo}`;
         const resposta = await fetch(url, {
           headers: {
             Accept: "application/json",

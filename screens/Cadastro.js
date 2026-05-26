@@ -27,7 +27,7 @@ export default function Cadastro() {
 
     try {
       const url =
-        "https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/cadastro";
+        "https://playdex-yh18.onrender.com/cadastro";
       const resposta = await fetch(url, {
         method: "POST",
         headers: {
