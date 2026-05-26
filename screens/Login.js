@@ -1,135 +1,188 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
-
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Alert,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
-    const navigation = useNavigation();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Atenção", "Por favor, preencha seu e-mail e senha!");
+      return;
+    }
+    try {
+      const url =
+        "https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/login";
+      const resposta = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "User-Agent": "PostmanRuntime/7.32.3",
+        },
+        body: JSON.stringify({ email, senha: password }),
+      });
+
+      const dados = await resposta.json();
+
+      if (resposta.ok) {
+        await AsyncStorage.setItem("usuarioLogado", dados.usuario.username);
+        Alert.alert("Sucesso!", dados.mensagem);
+        navigation.navigate("MainTabs");
+      } else {
+        Alert.alert("Erro", dados.erro);
+      }
+    } catch (erro) {
+      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
-        <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Image
+          source={require("../assets/icons/arrowleft.png")}
+          style={styles.backIcon}
+        />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Bem-vindo!</Text>
+      <Text style={styles.subtitle}>Entre na sua conta Playdex</Text>
+
+      <TextInput
+        style={styles.input}
+        onChangeText={setEmail}
+        value={email}
+        placeholder="E-mail ou username"
+        placeholderTextColor="#6F6F6F"
+      />
+
+      <View style={styles.passwordWrapper}>
+        <TextInput
+          style={[styles.input, { marginBottom: 0 }]}
+          onChangeText={setPassword}
+          value={password}
+          placeholder="Senha"
+          placeholderTextColor="#6F6F6F"
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeButton}
+          onPress={() => setShowPassword(!showPassword)}
         >
-            <Image
-                source={require('../assets/icons/arrowleft.png')}
-                style={styles.backIcon}
-            />
+          <Image
+            source={
+              showPassword
+                ? require("../assets/icons/StateEyeoff.png")
+                : require("../assets/icons/StateEye.png")
+            }
+            style={styles.eyeIcon}
+          />
         </TouchableOpacity>
+      </View>
 
-        <Text style={styles.title}>Bem-vindo!</Text>
-        <Text style={styles.subtitle}>Entre na sua conta Playdex</Text>
+      <TouchableOpacity style={styles.forgotContainer} onPress={() => {}}>
+        <Text style={styles.forgotText}>Esqueci minha senha</Text>
+      </TouchableOpacity>
 
-        <TextInput
-            style={styles.input}
-            onChangeText={setEmail}
-            value={email}
-            placeholder="E-mail ou username"
-            placeholderTextColor="#6F6F6F"
-        />
-
-        <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            value={password}
-            placeholder="Senha"
-            placeholderTextColor="#6F6F6F"
-            secureTextEntry={true}
-        />
-
-        <Text style={styles.password}>Esqueci minha senha</Text>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
-            <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        backgroundColor: '#000000',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    title: {
-        fontSize: 32,
-        marginBottom: 12,
-        textAlign: 'center',
-        fontWeight: '500',
-        color: '#E2E2E2',
-        marginLeft: 24,
-        marginRight: 24,
-    },
-
-    subtitle: {
-        fontSize: 22,
-        marginBottom: 72,
-        textAlign: 'center',
-        fontWeight: '500',
-        color: '#BDBCBC',
-        marginLeft: 24,
-        marginRight: 24,
-    },
-
-   password: {
-        fontSize: 16,
-        marginBottom: 24,
-        color: '#E2E2E2',
-        width: 312,           
-        textAlign: 'left',    
-    },
-
-    button: {
-        backgroundColor: '#5012FF',
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 40,
-        height: 49,
-        width: 312,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 24,   // ← adiciona isso
-    },
-
-    buttonText: {
-    color: '#FFFFFF',
+  container: {
+    flex: 1,
+    backgroundColor: "#000000",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "500",
+    color: "#E2E2E2",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: "#BDBCBC",
+    marginBottom: 60,
+    textAlign: "center",
+  },
+  input: {
+    backgroundColor: "#1C1C1C",
+    width: 312,
+    height: 50,
+    borderRadius: 40,
+    paddingHorizontal: 20,
+    color: "#FFFFFF",
+    marginBottom: 16,
+  },
+  passwordWrapper: {
+    width: 312,
+    height: 50,
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 20,
+    height: "100%",
+    justifyContent: "center",
+  },
+  eyeIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: "contain",
+  },
+  forgotContainer: {
+    width: 312,
+    alignItems: "flex-start",
+    marginBottom: 24,
+  },
+  forgotText: {
+    color: "#E2E2E2",
+    fontSize: 14,
+  },
+  button: {
+    backgroundColor: "#5012FF",
+    width: 312,
+    height: 50,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#FFFFFF",
     fontSize: 18,
-    textAlign: 'center',
-    textAlignVertical: 'center', // Garante centralização no Android
-    includeFontPadding: false, // Remove um respiro extra que o Android coloca e causa corte
-},
-
-    input: {
-        backgroundColor: '#1C1C1C',
-        width: 312,
-        height: 50,
-        marginBottom: 12,
-        paddingHorizontal: 20,
-        color: '#FFFFFF',
-        borderRadius: 40,
-    },
-
-    backButton: {
-        position: 'absolute',
-        top: 60,
-        left: 24,
-    },
-
-    backIcon: {
-        width: 24,
-        height: 24,
-        resizeMode: 'contain',
-    },
-
+    fontWeight: "600",
+  },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 24,
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+  },
 });
