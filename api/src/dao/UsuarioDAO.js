@@ -1,7 +1,8 @@
 const { Pool } = require('pg');
 
+// Agora usamos process.env.DATABASE_URL para proteger a sua senha!
 const pool = new Pool({
-  connectionString: 'postgresql://neondb_owner:npg_dZQjkNY7IP9m@ep-lively-waterfall-a4ww2lmv-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require',
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
@@ -85,20 +86,21 @@ class UsuarioDAO {
         return resultado.rows;
     }
 
-    // A FUNÇÃO DE SALVAR NO BANCO COM DURACAO E DATA CORRETAS
-    async postarAtividade(username, id_jogo, status, duracao, nota) {
+    // Atualizado para salvar a data do app e o texto da review na tabela!
+    async postarAtividade(username, id_jogo, status, duracao, data, nota, review) {
         const sql = `
-          INSERT INTO atividade (id_usuario, id_jogo, status, duracao, data, nota) 
+          INSERT INTO atividade (id_usuario, id_jogo, status, duracao, data, nota, review) 
           VALUES (
               (SELECT id FROM usuario WHERE username = $1), 
               $2, 
               $3, 
               $4, 
-              NOW(), 
-              $5
+              $5, 
+              $6,
+              $7
           )
         `;
-        const valores = [username, id_jogo, status, duracao, nota];
+        const valores = [username, id_jogo, status, duracao, data, nota, review];
         await pool.query(sql, valores);
     }
 }
