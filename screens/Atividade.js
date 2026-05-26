@@ -95,7 +95,7 @@ export default function Atividade() {
         review: review.trim() !== "" ? review : null,
       };
 
-      const url = `https://sturdy-space-system-grqgvwrpqw7cjw6-3000.app.github.dev/atividade`;
+      const url = `https://playdex-yh18.onrender.com/atividade`;
 
       const resposta = await fetch(url, {
         method: "POST",
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   textoRemover: {
-    color: "#FF4444",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "bold",
   },
