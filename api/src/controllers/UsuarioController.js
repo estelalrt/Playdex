@@ -100,21 +100,19 @@ class UsuarioController {
 
   // A FUNÇÃO DA FOFOCA COM OS NOMES CORRETOS
   async registrarAtividade(req, res) {
-    try {
-      // Pega o tempo ou duracao (o que vier) para garantir que não dê erro
-      const { username, id_jogo, status, tempo, duracao, nota } = req.body;
-      
-      const duracaoFinal = duracao || tempo || 0; 
+        try {
+            // Agora extraímos a data e a review que vêm do aplicativo
+            const { username, id_jogo, status, duracao, data, nota, review } = req.body;
 
-      console.log("CHEGOU DO CELULAR:", { username, id_jogo, status, duracaoFinal, nota });
-
-      await UsuarioDAO.postarAtividade(username, id_jogo, status, duracaoFinal, nota);
-      res.status(201).json({ mensagem: "Atividade postada com sucesso!" });
-    } catch (erro) {
-      console.log("Erro ao postar atividade:", erro);
-      res.status(500).json({ erro: "Erro interno no servidor" });
+            // Passamos na ordem exata que o DAO está esperando
+            await UsuarioDAO.postarAtividade(username, id_jogo, status, duracao, data, nota, review);
+            
+            res.status(201).json({ message: "Atividade registrada com sucesso!" });
+        } catch (erro) {
+            console.error("Erro ao registrar atividade:", erro);
+            res.status(500).json({ error: "Erro interno no servidor" });
+        }
     }
-  }
 }
 
 module.exports = new UsuarioController();
