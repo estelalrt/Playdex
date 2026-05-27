@@ -115,33 +115,31 @@ class UsuarioController {
   }
 
   async buscarJogosPopulares(req, res) {
-        try {
-            const RAWG_KEY = 'e1b2f6d050a1411eb60aeadbfdb03325'; 
-            
-            // Calculando dinamicamente os anos para o filtro de datas
-            const anoAtual = new Date().getFullYear();
-            const dataInicio = `${anoAtual - 1}-01-01`; // Ex: 2025-01-01
-            const dataFim = `${anoAtual}-12-31`;       // Ex: 2026-12-31
-            
-            // Adicionamos o filtro "dates=" antes do ordering
-            const url = `https://api.rawg.io/api/games?key=${RAWG_KEY}&dates=${dataInicio},${dataFim}&ordering=-added&page_size=10`;
+    try {
+      // Endpoint oficial da loja da Steam, já em português
+      const url = `https://store.steampowered.com/api/featuredcategories/?l=brazilian`;
+      
+      const resposta = await fetch(url);
+      const dados = await resposta.json();
 
-            const resposta = await fetch(url);
-            const dados = await resposta.json();
+      // Vamos pegar os jogos da categoria "Mais Vendidos" (top_sellers) 
+      // e usar o slice para limitar aos 10 primeiros, mantendo seu padrão anterior
+      const itensEmAlta = dados.top_sellers.items.slice(0, 10);
 
-            const jogosPopulares = dados.results.map(jogo => ({
-                id: jogo.id,
-                titulo: jogo.name,
-                foto_capa: jogo.background_image
-            }));
+      // Mapeamos para o formato exato que o seu React Native (Atividade.js) já espera
+      const jogosPopulares = itensEmAlta.map(jogo => ({
+        id: jogo.id,
+        titulo: jogo.name,
+        // Aplicando o padrão de URL oculta da Steam para capas verticais (mobile-friendly)
+        foto_capa: `https://cdn.akamai.steamstatic.com/steam/apps/${jogo.id}/library_600x900.jpg`
+      }));
 
-            res.status(200).json(jogosPopulares);
-        } catch (erro) {
-            console.error("Erro ao buscar jogos populares:", erro);
-            res.status(500).json({ error: "Erro interno ao buscar da RAWG" });
-        }
+      res.status(200).json(jogosPopulares);
+    } catch (erro) {
+      console.error("Erro ao buscar jogos populares da Steam:", erro);
+      res.status(500).json({ error: "Erro interno ao buscar da Steam" });
     }
-
+  }
 }
 
 module.exports = new UsuarioController();
