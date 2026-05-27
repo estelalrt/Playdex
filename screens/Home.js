@@ -145,23 +145,21 @@ export default function Home() {
       {carregandoJogos ? (
         <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
       ) : (
-        <FlatList 
-          data={jogosPopulares}
-          horizontal={true}
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id.toString()}
           style={styles.scrollWrapper}
           contentContainerStyle={styles.scrollContainer}
-          renderItem={({ item }) => (
-            <View style={styles.cardItem}>
+        >
+          {jogosPopulares.map((item, index) => (
+            <View key={index} style={styles.cardItem}>
               <Image source={{ uri: item.foto_capa }} style={styles.game} />
-              {/* Usamos o playerName e limitamos a largura para o texto não vazar da capa */}
               <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
                 {item.titulo}
               </Text>
             </View>
-          )}
-        />
+          ))}
+        </ScrollView>
       )}
     </ScrollView>
     
