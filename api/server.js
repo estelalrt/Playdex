@@ -9,7 +9,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Accept', 'User-Agent']
 }));
 
-// Precisa disso para o servidor entender os dados em JSON que o app envia
 app.use(express.json());
 
 // Suas rotas
@@ -22,6 +21,7 @@ app.get('/jogos/busca', UsuarioController.buscarJogo);
 app.put('/favoritos', UsuarioController.atualizarFavorito);
 app.get('/favoritos/:username', UsuarioController.listarFavoritos);
 app.post('/atividade', UsuarioController.registrarAtividade);
+app.get('/jogos/populares', UsuarioController.buscarJogosPopulares);
 
 app.listen(3000, () => {
   console.log('Rodando na porta 3000');
