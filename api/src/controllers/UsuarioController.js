@@ -112,7 +112,33 @@ class UsuarioController {
             console.error("Erro ao registrar atividade:", erro);
             res.status(500).json({ error: "Erro interno no servidor" });
         }
-    }
+  }
+
+  async buscarJogosPopulares(req, res) {
+        try {
+            // Se você já tem a sua chave da RAWG numa variável, coloque aqui!
+            const RAWG_KEY = 'e1b2f6d050a1411eb60aeadbfdb03325'; 
+            
+            // O ordering=-added traz os jogos mais populares/adicionados pelos usuários
+            const url = `https://api.rawg.io/api/games?key=${RAWG_KEY}&ordering=-added&page_size=10`;
+
+            const resposta = await fetch(url);
+            const dados = await resposta.json();
+
+            // Vamos limpar os dados para o app receber só o que importa
+            const jogosPopulares = dados.results.map(jogo => ({
+                id: jogo.id,
+                titulo: jogo.name,
+                foto_capa: jogo.background_image
+            }));
+
+            res.status(200).json(jogosPopulares);
+        } catch (erro) {
+            console.error("Erro ao buscar jogos populares:", erro);
+            res.status(500).json({ error: "Erro interno ao buscar da RAWG" });
+        }
+  }
+
 }
 
 module.exports = new UsuarioController();

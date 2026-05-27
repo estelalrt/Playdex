@@ -7,12 +7,16 @@ import {
   Image,
   TextInput,
   ScrollView,
+  FlatList,
+  ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [feed, setFeed] = useState([]);
+  const [jogosPopulares, setJogosPopulares] = useState([]);
+  const [carregandoJogos, setCarregandoJogos] = useState(true);
 
   useEffect(() => {
     const carregarFeed = async () => {
@@ -38,6 +42,24 @@ export default function Home() {
     };
     carregarFeed();
   }, []);
+
+  useEffect(() => {
+    async function buscarJogosPopulares() {
+        try {
+            // Aqui estamos chamando a rota nova que você acabou de criar no Render!
+            const resposta = await fetch('https://playdex-yh18.onrender.com/jogos/populares');
+            const dados = await resposta.json();
+            
+            setJogosPopulares(dados);
+        } catch (erro) {
+            console.error("Erro ao carregar jogos populares:", erro);
+        } finally {
+            setCarregandoJogos(false);
+        }
+    }
+
+    buscarJogosPopulares();
+}, []);
 
   const renderIconeStatus = (status) => {
     if (status === 'Jogando') return <Ionicons name="game-controller" size={16} color="#FFFFFF" />;
@@ -118,7 +140,31 @@ export default function Home() {
           </View>
         ))}
       </ScrollView>
+      <Text style={styles.sectionTitle}>Em Alta</Text>
+    
+      {carregandoJogos ? (
+        <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
+      ) : (
+        <FlatList 
+          data={jogosPopulares}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.scrollWrapper}
+          contentContainerStyle={styles.scrollContainer}
+          renderItem={({ item }) => (
+            <View style={styles.cardItem}>
+              <Image source={{ uri: item.foto_capa }} style={styles.game} />
+              {/* Usamos o playerName e limitamos a largura para o texto não vazar da capa */}
+              <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
+                {item.titulo}
+              </Text>
+            </View>
+          )}
+        />
+      )}
     </ScrollView>
+    
   );
 }
 
