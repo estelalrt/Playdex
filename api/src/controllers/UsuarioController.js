@@ -116,16 +116,19 @@ class UsuarioController {
 
   async buscarJogosPopulares(req, res) {
         try {
-            // Se você já tem a sua chave da RAWG numa variável, coloque aqui!
             const RAWG_KEY = 'e1b2f6d050a1411eb60aeadbfdb03325'; 
             
-            // O ordering=-added traz os jogos mais populares/adicionados pelos usuários
-            const url = `https://api.rawg.io/api/games?key=${RAWG_KEY}&ordering=-added&page_size=10`;
+            // Calculando dinamicamente os anos para o filtro de datas
+            const anoAtual = new Date().getFullYear();
+            const dataInicio = `${anoAtual - 1}-01-01`; // Ex: 2025-01-01
+            const dataFim = `${anoAtual}-12-31`;       // Ex: 2026-12-31
+            
+            // Adicionamos o filtro "dates=" antes do ordering
+            const url = `https://api.rawg.io/api/games?key=${RAWG_KEY}&dates=${dataInicio},${dataFim}&ordering=-added&page_size=10`;
 
             const resposta = await fetch(url);
             const dados = await resposta.json();
 
-            // Vamos limpar os dados para o app receber só o que importa
             const jogosPopulares = dados.results.map(jogo => ({
                 id: jogo.id,
                 titulo: jogo.name,
@@ -137,7 +140,7 @@ class UsuarioController {
             console.error("Erro ao buscar jogos populares:", erro);
             res.status(500).json({ error: "Erro interno ao buscar da RAWG" });
         }
-  }
+    }
 
 }
 
