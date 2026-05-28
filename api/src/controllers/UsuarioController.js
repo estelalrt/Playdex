@@ -116,28 +116,12 @@ class UsuarioController {
 
   async buscarJogosPopulares(req, res) {
     try {
-      // Endpoint oficial da loja da Steam, já em português
-      const url = `https://store.steampowered.com/api/featuredcategories/?l=brazilian`;
+      const jogosPopulares = await UsuarioDAO.pegarJogosEmAlta(); 
       
-      const resposta = await fetch(url);
-      const dados = await resposta.json();
-
-      // Vamos pegar os jogos da categoria "Mais Vendidos" (top_sellers) 
-      // e usar o slice para limitar aos 10 primeiros, mantendo seu padrão anterior
-      const itensEmAlta = dados.top_sellers.items.slice(0, 10);
-
-      // Mapeamos para o formato exato que o seu React Native (Atividade.js) já espera
-      const jogosPopulares = itensEmAlta.map(jogo => ({
-        id: jogo.id,
-        titulo: jogo.name,
-        // Aplicando o padrão de URL oculta da Steam para capas verticais (mobile-friendly)
-        foto_capa: `https://cdn.akamai.steamstatic.com/steam/apps/${jogo.id}/library_600x900.jpg`
-      }));
-
       res.status(200).json(jogosPopulares);
     } catch (erro) {
-      console.error("Erro ao buscar jogos populares da Steam:", erro);
-      res.status(500).json({ error: "Erro interno ao buscar da Steam" });
+      console.error("Erro ao buscar jogos populares no banco:", erro);
+      res.status(500).json({ error: "Erro interno ao buscar jogos em alta" });
     }
   }
 }

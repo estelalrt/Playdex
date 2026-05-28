@@ -103,6 +103,27 @@ class UsuarioDAO {
         const valores = [username, id_jogo, status, duracao, data, nota, review];
         await pool.query(sql, valores);
     }
+
+    async pegarJogosEmAlta() {
+    try {
+      // O INNER JOIN junta a tabela 'jogos_em_alta' com a sua tabela principal 'jogos'
+      const sql = `
+        SELECT j.id, j.titulo, j.foto_capa 
+        FROM jogos_em_alta ja
+        INNER JOIN jogos j ON ja.id_jogo = j.id
+        ORDER BY ja.posicao ASC
+      `;
+
+      // Substitua 'db.query' ou 'conexao.query' pelo comando exato
+      // que você já usa nas outras funções do seu DAO para executar SQL.
+      const [resultados] = await conexao.query(sql); 
+
+      return resultados;
+    } catch (erro) {
+      console.error("Erro no DAO ao buscar jogos em alta:", erro);
+      throw erro; 
+    }
+  }
 }
 
 module.exports = new UsuarioDAO();
