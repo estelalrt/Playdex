@@ -11,7 +11,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Suas rotas
+
 app.post('/login', UsuarioController.login);
 app.post('/cadastro', UsuarioController.cadastrar);
 app.put('/atualizar-perfil', UsuarioController.atualizarPerfil);
@@ -22,6 +22,7 @@ app.put('/favoritos', UsuarioController.atualizarFavorito);
 app.get('/favoritos/:username', UsuarioController.listarFavoritos);
 app.post('/atividade', UsuarioController.registrarAtividade);
 app.get('/jogos/populares', UsuarioController.buscarJogosPopulares);
+app.get("/usuario/:username/atividades", UsuarioController.buscarAtividadesPerfil);
 
 app.listen(3000, () => {
   console.log('Rodando na porta 3000');

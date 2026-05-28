@@ -124,6 +124,26 @@ class UsuarioDAO {
       throw erro; 
     }
   }
+
+  async pegarAtividadesDoUsuario(username) {
+        const sql = `
+          SELECT 
+            a.id,
+            a.status,
+            a.duracao,
+            a.data,
+            a.nota,
+            a.review,
+            j.titulo AS jogo_titulo,
+            j.foto_capa AS jogo_capa
+          FROM atividade a
+          JOIN jogo j ON a.id_jogo = j.id
+          WHERE a.id_usuario = (SELECT id FROM usuario WHERE username = $1)
+          ORDER BY a.data DESC;
+        `;
+        const resultado = await pool.query(sql, [username]);
+        return resultado.rows;
+    }
 }
 
 module.exports = new UsuarioDAO();

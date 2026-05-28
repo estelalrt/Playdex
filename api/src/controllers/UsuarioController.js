@@ -124,6 +124,17 @@ class UsuarioController {
       res.status(500).json({ error: "Erro interno ao buscar jogos em alta" });
     }
   }
+
+  async buscarAtividadesPerfil(req, res) {
+    try {
+      const { username } = req.params;
+      const atividades = await UsuarioDAO.pegarAtividadesDoUsuario(username);
+      res.status(200).json(atividades);
+    } catch (erro) {
+      console.error("Erro ao buscar atividades do perfil:", erro);
+      res.status(500).json({ mensagem: "Erro ao buscar diário de atividades" });
+    }
+  }
 }
 
 module.exports = new UsuarioController();

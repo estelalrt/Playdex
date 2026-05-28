@@ -29,9 +29,11 @@ export default function Perfil() {
   const [query, setQuery] = useState("");
   const [sugestoes, setSugestoes] = useState([]);
 
+  // Estado do Diário de Atividades
+  const [diario, setDiario] = useState([]);
+
   // URL BASE DO BACKEND
-  const URL_BASE =
-    "https://playdex-yh18.onrender.com";
+  const URL_BASE = "https://playdex-yh18.onrender.com";
 
   // 1. CARREGAR TUDO AO ABRIR A TELA
   useEffect(() => {
@@ -77,6 +79,19 @@ export default function Perfil() {
           });
           setFavoritos(novosFavs);
         }
+
+        // NOVO: Busca o Diário de Atividades
+        const resDiario = await fetch(`${URL_BASE}/atividades/${usuarioSalvo}`, {
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "PostmanRuntime/7.32.3",
+          },
+        });
+        const dadosDiario = await resDiario.json();
+        if (resDiario.ok) {
+          setDiario(dadosDiario);
+        }
+
       } catch (erro) {
         console.log("Erro ao carregar dados:", erro);
       }
@@ -174,7 +189,7 @@ export default function Perfil() {
 
         const respostaCloudinary = await fetch(
           "https://api.cloudinary.com/v1_1/dvtbgnv4v/image/upload",
-          { method: "POST", body: data },
+          { method: "POST", body: data }
         );
         const dadosNuvem = await respostaCloudinary.json();
 
@@ -194,7 +209,7 @@ export default function Perfil() {
               foto_perfil: linkDaFoto,
             }),
           });
-          Alert.alert("Sucesso!", "Foto updated!");
+          Alert.alert("Sucesso!", "Foto atualizada!");
         }
       } catch (erro) {
         Alert.alert("Erro", "Falha ao enviar foto para a nuvem.");
@@ -293,6 +308,50 @@ export default function Perfil() {
             ))}
           </View>
         </View>
+
+        {/* NOVA SEÇÃO: DIÁRIO DE ATIVIDADES */}
+        <View style={styles.secaoDiario}>
+          <Text style={styles.subtitulo}>Diário Recente</Text>
+          
+          {diario.length === 0 ? (
+            <Text style={styles.textoVazio}>Você ainda não registrou nenhuma atividade.</Text>
+          ) : (
+            diario.map((item, index) => (
+              <View key={index} style={styles.cardAtividade}>
+                <Image source={{ uri: item.jogo_capa }} style={styles.capaDiario} />
+                
+                <View style={styles.infoDiario}>
+                  <Text style={styles.tituloJogoDiario}>{item.jogo_titulo}</Text>
+                  
+                  {/* Linha de status e data */}
+                  <View style={styles.linhaStatusData}>
+                    <Text style={styles.textoStatus}>{item.status}</Text>
+                    {item.data && (
+                      <Text style={styles.textoData}>
+                        • {new Date(item.data).toLocaleDateString('pt-BR')}
+                      </Text>
+                    )}
+                  </View>
+                  
+                  {/* Avaliação */}
+                  {item.nota > 0 && (
+                    <Text style={styles.textoNota}>Avaliação: {item.nota} / 5</Text>
+                  )}
+                  
+                  {/* Review */}
+                  {item.review && (
+                    <Text style={styles.textoReview} numberOfLines={3}>
+                      "{item.review}"
+                    </Text>
+                  )}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+        
+        {/* Espaço extra no final da scrollview pra não colar no bottom bar */}
+        <View style={{ height: 40 }} /> 
       </ScrollView>
 
       <Modal visible={modalVisivel} animationType="slide">
@@ -399,7 +458,6 @@ const styles = StyleSheet.create({
   },
   secaoFavoritos: {
     marginTop: 40,
-    marginBottom: 40,
   },
   subtitulo: {
     color: "#FFFFFF",
@@ -426,6 +484,69 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+  },
+  // ESTILOS NOVOS DO DIÁRIO
+  secaoDiario: {
+    marginTop: 40,
+  },
+  textoVazio: {
+    color: "#6F6F6F",
+    fontSize: 14,
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 10,
+  },
+  cardAtividade: {
+    flexDirection: "row",
+    backgroundColor: "#1C1C1C",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#2A2A2A",
+  },
+  capaDiario: {
+    width: 60,
+    height: 90,
+    borderRadius: 6,
+    marginRight: 16,
+  },
+  infoDiario: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  tituloJogoDiario: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  linhaStatusData: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  textoStatus: {
+    color: "#00BEBE", // Usando aquele seu ciano do componente de estrelas
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  textoData: {
+    color: "#6F6F6F",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  textoNota: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  textoReview: {
+    color: "#B3B3B3",
+    fontSize: 13,
+    fontStyle: "italic",
+    lineHeight: 18,
+    marginTop: 4,
   },
   modalContainer: {
     flex: 1,
