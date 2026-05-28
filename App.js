@@ -15,26 +15,56 @@ import Atividade from "./screens/Atividade";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // Mantém escondido por padrão
+        headerShown: false,
         tabBarShowLabel: false,
-        // ... (resto do seu código do TabBar continua igualzinho)
+        tabBarStyle: {
+          backgroundColor: "#1C1C1C",
+          borderTopWidth: 0,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: "#5012FF",
+        tabBarInactiveTintColor: "#6F6F6F",
+        tabBarIcon: ({ focused, color, size }) => {
+          
+          // O botão especial da Atividade fica no meio
+          if (route.name === "Atividade") {
+            return (
+              <View style={[styles.botaoFlutuante, focused && styles.botaoFlutuanteAtivo]}>
+                <Ionicons name="add" size={32} color="#FFFFFF" />
+              </View>
+            );
+          }
+
+          // Ícones normais para Home e Perfil
+          let iconName;
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "Perfil") {
+            iconName = focused ? "person" : "person-outline";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
       })}
     >
       <Tab.Screen 
         name="Home" 
         component={Home} 
         options={{ 
-          headerShown: true, // Liga a barra superior só para essa tela
-          title: "Início", // O nome bonitinho que vai aparecer lá em cima
+          headerShown: true, // Liga a barra superior
+          title: "Início", // Nome elegante
           headerStyle: { 
-            backgroundColor: '#1C1C1C', // Fundo escuro combinando com o app
-            borderBottomWidth: 0, // Tira a linha de divisão para ficar moderno
+            backgroundColor: '#1C1C1C', 
+            borderBottomWidth: 0 
           },
-          headerTintColor: '#FFFFFF' // Cor do texto
+          headerTintColor: '#FFFFFF' 
         }} 
       />
       <Tab.Screen 
