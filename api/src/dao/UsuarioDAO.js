@@ -106,19 +106,19 @@ class UsuarioDAO {
 
     async pegarJogosEmAlta() {
     try {
-      // O INNER JOIN junta a tabela 'jogos_em_alta' com a sua tabela principal 'jogos'
+      // Ajustamos 'jogos' para 'jogo' (singular)
       const sql = `
         SELECT j.id, j.titulo, j.foto_capa 
         FROM jogos_em_alta ja
-        INNER JOIN jogos j ON ja.id_jogo = j.id
+        INNER JOIN jogo j ON ja.id_jogo = j.id
         ORDER BY ja.posicao ASC
       `;
 
-      // Substitua 'db.query' ou 'conexao.query' pelo comando exato
-      // que você já usa nas outras funções do seu DAO para executar SQL.
-      const [resultados] = await conexao.query(sql); 
+      // Trocamos 'conexao' por 'pool' e ajustamos o formato da variável
+      const resultado = await pool.query(sql); 
 
-      return resultados;
+      // Retornamos 'resultado.rows' no mesmo padrão que você já usa no arquivo
+      return resultado.rows;
     } catch (erro) {
       console.error("Erro no DAO ao buscar jogos em alta:", erro);
       throw erro; 
