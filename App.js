@@ -58,10 +58,6 @@ function MainTabs() {
         }}
       />
     </Tab.Navigator>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Atividade" component={Atividade} /> 
-      <Tab.Screen name="Perfil" component={Perfil} />
-    </Tab.Navigator>
   );
 }
 
