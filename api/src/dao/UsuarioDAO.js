@@ -144,6 +144,30 @@ class UsuarioDAO {
         const resultado = await pool.query(sql, [username]);
         return resultado.rows;
     }
+
+    async pegarRecomendacoes(username) {
+        const sql = `
+            SELECT j.id, j.titulo, j.foto_capa
+            FROM jogo j
+            WHERE j.genero = (
+                SELECT j2.genero
+                FROM favoritos f
+                JOIN jogo j2 ON f.id_jogo = j2.id
+                WHERE f.id_usuario = (SELECT id FROM usuario WHERE username = $1)
+                AND j2.genero IS NOT NULL
+                ORDER BY f.posicao ASC
+                LIMIT 1
+            )
+            AND j.id NOT IN (
+                SELECT id_jogo FROM favoritos 
+                WHERE id_usuario = (SELECT id FROM usuario WHERE username = $1)
+                AND id_jogo IS NOT NULL
+            )
+            LIMIT 5;
+        `;
+        const resultado = await pool.query(sql, [username]);
+        return resultado.rows;
+    }
 }
 
 module.exports = new UsuarioDAO();
