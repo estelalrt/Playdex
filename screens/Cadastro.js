@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Adicionado o AsyncStorage aqui!
 
 export default function Cadastro() {
   const navigation = useNavigation();
@@ -26,8 +27,7 @@ export default function Cadastro() {
     }
 
     try {
-      const url =
-        "https://playdex-yh18.onrender.com/cadastro";
+      const url = "https://playdex-yh18.onrender.com/cadastro";
       const resposta = await fetch(url, {
         method: "POST",
         headers: {
@@ -41,6 +41,10 @@ export default function Cadastro() {
       const dados = await resposta.json();
 
       if (resposta.ok) {
+        // A MÁGICA ACONTECE AQUI: 
+        // Salvamos o username novo na memória antes de mudar de tela!
+        await AsyncStorage.setItem("usuarioLogado", username);
+
         Alert.alert("Sucesso!", "Conta criada com sucesso!");
         navigation.navigate("MainTabs");
       } else {

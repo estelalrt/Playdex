@@ -16,7 +16,7 @@ class UsuarioDAO {
     }
 
     async criarUsuario(nome, email, username, senha) {
-        const sql = 'INSERT INTO usuario (nome, email, username, senha) VALUES ($1, $2, $3, $4) RETURNING id, nome';
+        const sql = 'INSERT INTO usuario (nome, email, username, senha) VALUES ($1, $2, $3, $4) RETURNING id, nome, username';
         const valores = [nome, email, username, senha];
         const resultado = await pool.query(sql, valores);
         return resultado.rows[0];
