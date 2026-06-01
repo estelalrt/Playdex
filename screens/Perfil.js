@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    marginTop: 60,
+    marginTop: 20,
   },
   userInfo: {
     flexDirection: "row",

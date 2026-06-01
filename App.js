@@ -57,35 +57,17 @@ function MainTabs() {
       <Tab.Screen 
         name="Home" 
         component={Home} 
-        options={{ 
-          headerShown: true, // Liga a barra superior
-          title: "Início", // Nome elegante
-          headerStyle: { 
-            backgroundColor: '#1C1C1C', 
-            borderBottomWidth: 0 
-          },
-          headerTintColor: '#FFFFFF' 
-        }} 
+        options={{ headerShown: false }} 
       />
       <Tab.Screen 
         name="Atividade" 
         component={Atividade} 
-        options={{ 
-          headerShown: true,
-          title: "Nova Atividade", 
-          headerStyle: { backgroundColor: '#1C1C1C', borderBottomWidth: 0 },
-          headerTintColor: '#FFFFFF'
-        }}
+        options={{ headerShown: false }}
       /> 
       <Tab.Screen 
         name="Perfil" 
         component={Perfil} 
-        options={{ 
-          headerShown: true,
-          title: "Meu Perfil", 
-          headerStyle: { backgroundColor: '#1C1C1C', borderBottomWidth: 0 },
-          headerTintColor: '#FFFFFF'
-        }}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
