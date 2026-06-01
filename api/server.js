@@ -22,7 +22,7 @@ app.put('/favoritos', UsuarioController.atualizarFavorito);
 app.get('/favoritos/:username', UsuarioController.listarFavoritos);
 app.post('/atividade', UsuarioController.registrarAtividade);
 app.get('/jogos/populares', UsuarioController.buscarJogosPopulares);
-app.get("/usuario/:username/atividades", UsuarioController.buscarAtividadesPerfil);
+app.get('/atividades/:username', UsuarioController.buscarAtividadesPerfil);
 
 app.listen(3000, () => {
   console.log('Rodando na porta 3000');
