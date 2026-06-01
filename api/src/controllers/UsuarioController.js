@@ -135,6 +135,17 @@ class UsuarioController {
       res.status(500).json({ mensagem: "Erro ao buscar diário de atividades" });
     }
   }
+
+  async buscarRecomendacoes(req, res) {
+        try {
+            const { username } = req.params;
+            const recomendados = await UsuarioDAO.pegarRecomendacoes(username);
+            res.status(200).json(recomendados);
+        } catch (erro) {
+            console.error("Erro ao buscar recomendações:", erro);
+            res.status(500).json({ erro: "Falha ao buscar recomendações" });
+        }
+    }
 }
 
 module.exports = new UsuarioController();
