@@ -1,16 +1,16 @@
 import React from "react";
-import { View, StyleSheet } from "react-native"; // <-- Adicionado View e StyleSheet
+import { View, StyleSheet } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-
 import Welcome from "./screens/Welcome";
 import Login from "./screens/Login";
 import Cadastro from "./screens/Cadastro";
 import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import Atividade from "./screens/Atividade";
+import Jogo from "./screens/Jogo"; 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -84,6 +84,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="Jogo" component={Jogo} />
         
       </Stack.Navigator>
     </NavigationContainer>
