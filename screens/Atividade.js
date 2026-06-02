@@ -13,11 +13,13 @@ import {
 // Adicionamos o FontAwesome aqui nos imports!
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Atividade() {
   const [query, setQuery] = useState("");
   const [sugestoes, setSugestoes] = useState([]);
   const [jogoSelecionado, setJogoSelecionado] = useState(null);
+  const navigation = useNavigation();
 
   const [status, setStatus] = useState("");
   const [duracao, setDuracao] = useState("");
@@ -116,6 +118,7 @@ export default function Atividade() {
         setNota(0);
         setReview("");
         setQuery("");
+        navigation.goBack();
       } else {
         const erro = await resposta.json();
         Alert.alert("Ops!", erro.mensagem || "Deu algum erro no servidor.");

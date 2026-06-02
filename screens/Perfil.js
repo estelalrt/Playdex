@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -35,70 +36,72 @@ export default function Perfil() {
   // URL BASE DO BACKEND
   const URL_BASE = "https://playdex-yh18.onrender.com";
 
-  // 1. CARREGAR TUDO AO ABRIR A TELA
-  useEffect(() => {
-    const carregarPerfilEFavoritos = async () => {
-      try {
-        const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
-        if (!usuarioSalvo) return;
-        setMeuUsername(usuarioSalvo);
+  // 1. CARREGAR TUDO AO ABRIR A TELA (AGORA COM USEFOCUSEFFECT)
+  useFocusEffect(
+    useCallback(() => {
+      const carregarPerfilEFavoritos = async () => {
+        try {
+          const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+          if (!usuarioSalvo) return;
+          setMeuUsername(usuarioSalvo);
 
-        // Busca Bio e Foto
-        const resPerfil = await fetch(`${URL_BASE}/perfil/${usuarioSalvo}`, {
-          headers: {
-            Accept: "application/json",
-            "User-Agent": "PostmanRuntime/7.32.3",
-          },
-        });
-        const dadosPerfil = await resPerfil.json();
-        if (resPerfil.ok) {
-          if (dadosPerfil.bio) {
-            setBio(dadosPerfil.bio);
-            setTempBio(dadosPerfil.bio);
-          }
-          if (
-            dadosPerfil.foto_perfil &&
-            dadosPerfil.foto_perfil.startsWith("http")
-          ) {
-            setFotoUri(dadosPerfil.foto_perfil);
-          }
-        }
-
-        // Busca Favoritos
-        const resFav = await fetch(`${URL_BASE}/favoritos/${usuarioSalvo}`, {
-          headers: {
-            Accept: "application/json",
-            "User-Agent": "PostmanRuntime/7.32.3",
-          },
-        });
-        const dadosFav = await resFav.json();
-        if (resFav.ok) {
-          const novosFavs = [null, null, null, null];
-          dadosFav.forEach((f) => {
-            novosFavs[f.posicao] = f;
+          // Busca Bio e Foto
+          const resPerfil = await fetch(`${URL_BASE}/perfil/${usuarioSalvo}`, {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "PostmanRuntime/7.32.3",
+            },
           });
-          setFavoritos(novosFavs);
+          const dadosPerfil = await resPerfil.json();
+          if (resPerfil.ok) {
+            if (dadosPerfil.bio) {
+              setBio(dadosPerfil.bio);
+              setTempBio(dadosPerfil.bio);
+            }
+            if (
+              dadosPerfil.foto_perfil &&
+              dadosPerfil.foto_perfil.startsWith("http")
+            ) {
+              setFotoUri(dadosPerfil.foto_perfil);
+            }
+          }
+
+          // Busca Favoritos
+          const resFav = await fetch(`${URL_BASE}/favoritos/${usuarioSalvo}`, {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "PostmanRuntime/7.32.3",
+            },
+          });
+          const dadosFav = await resFav.json();
+          if (resFav.ok) {
+            const novosFavs = [null, null, null, null];
+            dadosFav.forEach((f) => {
+              novosFavs[f.posicao] = f;
+            });
+            setFavoritos(novosFavs);
+          }
+
+          // Busca o Diário de Atividades
+          const resDiario = await fetch(`${URL_BASE}/atividades/${usuarioSalvo}`, {
+            headers: {
+              Accept: "application/json",
+              "User-Agent": "PostmanRuntime/7.32.3",
+            },
+          });
+          const dadosDiario = await resDiario.json();
+          if (resDiario.ok) {
+            setDiario(dadosDiario);
+          }
+
+        } catch (erro) {
+          console.log("Erro ao carregar dados:", erro);
         }
+      };
 
-        // NOVO: Busca o Diário de Atividades
-        const resDiario = await fetch(`${URL_BASE}/atividades/${usuarioSalvo}`, {
-          headers: {
-            Accept: "application/json",
-            "User-Agent": "PostmanRuntime/7.32.3",
-          },
-        });
-        const dadosDiario = await resDiario.json();
-        if (resDiario.ok) {
-          setDiario(dadosDiario);
-        }
-
-      } catch (erro) {
-        console.log("Erro ao carregar dados:", erro);
-      }
-    };
-
-    carregarPerfilEFavoritos();
-  }, []);
+      carregarPerfilEFavoritos();
+    }, [])
+  );
 
   // 2. FUNÇÕES DE PESQUISA E SELEÇÃO DE JOGO
   const abrirPesquisa = (index) => {
