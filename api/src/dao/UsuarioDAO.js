@@ -42,7 +42,8 @@ class UsuarioDAO {
             amigo.foto_perfil, 
             jogo.foto_capa,
             atividade.status,  
-            atividade.nota    
+            atividade.nota,
+            jogo.id AS id_jogo    
         FROM atividade
         JOIN usuario amigo ON atividade.id_usuario = amigo.id
         JOIN jogo ON atividade.id_jogo = jogo.id
