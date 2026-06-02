@@ -107,14 +107,14 @@ export default function Login() {
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={[styles.botao, carregando && { opacity: 0.7 }]} // Deixa o botão um pouco transparente enquanto carrega
+        style={[styles.button, carregando && { opacity: 0.7 }]} // <-- TROCADO PARA styles.button
         onPress={handleLogin}
-        disabled={carregando} // ISSO AQUI IMPEDE O CLIQUE DUPLO!
+        disabled={carregando} 
       >
         {carregando ? (
           <ActivityIndicator size="small" color="#FFFFFF" />
         ) : (
-          <Text style={styles.textoBotao}>Entrar</Text>
+          <Text style={styles.buttonText}>Entrar</Text> // <-- TROCADO PARA styles.buttonText
         )}
       </TouchableOpacity>
     </View>
