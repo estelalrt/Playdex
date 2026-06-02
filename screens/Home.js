@@ -106,37 +106,44 @@ export default function Home() {
       </View>
 
       <Text style={styles.sectionTitle}>Atividade de amigos</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.scrollWrapper}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        {feed.map((item, index) => (
-          <View key={index} style={styles.cardItem}>
-            <Image
-              source={{
-                uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
-              }}
-              style={styles.game}
-            />
-            <View style={styles.activityInfo}>
+      
+      {feed.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.scrollWrapper}
+          contentContainerStyle={styles.scrollContainer}
+        >
+          {feed.map((item, index) => (
+            <View key={index} style={styles.cardItem}>
               <Image
                 source={{
-                  uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
+                  uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
                 }}
-                style={styles.player}
+                style={styles.game}
               />
-              <View style={styles.nomeEIcone}>
-                <Text style={styles.playerName} numberOfLines={1}>
-                  {item.username}
-                </Text>
-                {renderIconeStatus(item.status)}
+              <View style={styles.activityInfo}>
+                <Image
+                  source={{
+                    uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
+                  }}
+                  style={styles.player}
+                />
+                <View style={styles.nomeEIcone}>
+                  <Text style={styles.playerName} numberOfLines={1}>
+                    {item.username}
+                  </Text>
+                  {renderIconeStatus(item.status)}
+                </View>
               </View>
             </View>
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      ) : (
+        <Text style={styles.textoVazio}>
+          Você ainda não adicionou amigos ou eles não possuem atividades recentes.
+        </Text>
+      )}
 
       <Text style={styles.sectionTitle}>Em Alta</Text>
       {carregandoJogos ? (
