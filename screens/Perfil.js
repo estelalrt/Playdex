@@ -349,7 +349,32 @@ export default function Perfil() {
             ))
           )}
         </View>
-        
+        {/* NOVA SEÇÃO: LINKS ESTILO LETTERBOXD */}
+        <View style={styles.secaoLinks}>
+          <TouchableOpacity 
+            style={styles.linkRow} 
+            onPress={() => Alert.alert("Em breve", "Aqui vai ficar a sua biblioteca completa!")}
+          >
+            <Text style={styles.linkText}>Sua biblioteca</Text>
+            <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.linkRow}
+            onPress={() => Alert.alert("Em breve", "Aqui vão ficar os jogos que você marcou como 'Quero Jogar'")}
+          >
+            <Text style={styles.linkText}>Quero Jogar</Text>
+            <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.linkRow}
+            onPress={() => Alert.alert("Em breve", "Suas listas personalizadas aparecerão aqui")}
+          >
+            <Text style={styles.linkText}>Listas</Text>
+            <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+          </TouchableOpacity>
+        </View>
         {/* Espaço extra no final da scrollview pra não colar no bottom bar */}
         <View style={{ height: 40 }} /> 
       </ScrollView>
@@ -593,5 +618,24 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     flex: 1,
+  },
+  // ESTILOS DOS LINKS (TIPO LETTERBOXD)
+  secaoLinks: {
+    marginTop: 32,
+    borderTopWidth: 1,
+    borderTopColor: "#1C1C1C",
+  },
+  linkRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1C1C1C",
+  },
+  linkText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
