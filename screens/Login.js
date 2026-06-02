@@ -108,7 +108,7 @@ export default function Login() {
 
       <TouchableOpacity 
         style={[styles.botao, carregando && { opacity: 0.7 }]} // Deixa o botão um pouco transparente enquanto carrega
-        onPress={fazerLogin}
+        onPress={handleLogin}
         disabled={carregando} // ISSO AQUI IMPEDE O CLIQUE DUPLO!
       >
         {carregando ? (
