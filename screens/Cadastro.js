@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Adicionado o AsyncStorage aqui!
@@ -19,12 +20,17 @@ export default function Cadastro() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
   const handleRegister = async () => {
+    // 1. Primeiro verifica se tudo está preenchido
     if (!nome || !email || !username || !password) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
+
+    // 2. Tudo certo? Liga o carregamento e trava o botão!
+    setCarregando(true);
 
     try {
       const url = "https://playdex-yh18.onrender.com/cadastro";
@@ -41,10 +47,7 @@ export default function Cadastro() {
       const dados = await resposta.json();
 
       if (resposta.ok) {
-        // A MÁGICA ACONTECE AQUI: 
-        // Salvamos o username novo na memória antes de mudar de tela!
         await AsyncStorage.setItem("usuarioLogado", username);
-
         Alert.alert("Sucesso!", "Conta criada com sucesso!");
         navigation.navigate("MainTabs");
       } else {
@@ -52,6 +55,9 @@ export default function Cadastro() {
       }
     } catch (erro) {
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    } finally {
+      // 3. Desliga o carregamento, não importa o que aconteça no final
+      setCarregando(false);
     }
   };
 
@@ -133,8 +139,16 @@ export default function Cadastro() {
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
+      <TouchableOpacity 
+        style={[styles.button, carregando && { opacity: 0.7 }]} 
+        onPress={handleRegister}
+        disabled={carregando} // Impede cliques extras enquanto a requisição acontece
+      >
+        {carregando ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

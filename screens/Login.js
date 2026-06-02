@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,12 +17,14 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Atenção", "Por favor, preencha seu e-mail e senha!");
       return;
     }
+    setCarregando(true);
     try {
       const url =
         "https://playdex-yh18.onrender.com/login";
@@ -46,6 +49,9 @@ export default function Login() {
       }
     } catch (erro) {
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    } finally {
+      // Desliga a "rodinha" quando terminar, quer tenha dado certo ou erro
+      setCarregando(false);
     }
   };
 
@@ -100,8 +106,16 @@ export default function Login() {
         <Text style={styles.forgotText}>Esqueci minha senha</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity 
+        style={[styles.botao, carregando && { opacity: 0.7 }]} // Deixa o botão um pouco transparente enquanto carrega
+        onPress={fazerLogin}
+        disabled={carregando} // ISSO AQUI IMPEDE O CLIQUE DUPLO!
+      >
+        {carregando ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <Text style={styles.textoBotao}>Entrar</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
