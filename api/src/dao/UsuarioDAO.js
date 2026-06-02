@@ -166,6 +166,12 @@ class UsuarioDAO {
         const resultado = await pool.query(sql, [username]);
         return resultado.rows;
     }
+
+    async buscarJogoPorId(id) {
+        const sql = 'SELECT * FROM jogo WHERE id = $1';
+        const resultado = await pool.query(sql, [id]);
+        return resultado.rows[0];
+    }
 }
 
 module.exports = new UsuarioDAO();

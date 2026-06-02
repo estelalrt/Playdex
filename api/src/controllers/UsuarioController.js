@@ -78,6 +78,24 @@ class UsuarioController {
     }
   }
 
+  async buscarDetalhesJogo(req, res) {
+    try {
+      // Pega o ID que virá na URL (ex: /jogos/1)
+      const { id } = req.params; 
+      
+      const jogo = await UsuarioDAO.buscarJogoPorId(id);
+      
+      if (jogo) {
+        return res.status(200).json(jogo);
+      } else {
+        return res.status(404).json({ erro: "Jogo não encontrado" });
+      }
+    } catch (erro) {
+      console.error("Erro ao buscar detalhes do jogo:", erro);
+      return res.status(500).json({ mensagem: "Erro ao carregar detalhes do jogo" });
+    }
+  }
+
   async atualizarFavorito(req, res) {
     try {
       const { username, id_jogo, posicao } = req.body;

@@ -11,7 +11,6 @@ app.use(cors({
 
 app.use(express.json());
 
-
 app.post('/login', UsuarioController.login);
 app.post('/cadastro', UsuarioController.cadastrar);
 app.put('/atualizar-perfil', UsuarioController.atualizarPerfil);
@@ -24,6 +23,9 @@ app.post('/atividade', UsuarioController.registrarAtividade);
 app.get('/jogos/populares', UsuarioController.buscarJogosPopulares);
 app.get('/atividades/:username', UsuarioController.buscarAtividadesPerfil);
 app.get('/recomendacoes/:username', UsuarioController.buscarRecomendacoes);
+
+// Olha como fica mais limpo chamando o Controller:
+app.get('/jogo/:id', UsuarioController.buscarDetalhesJogo); 
 
 app.listen(3000, () => {
   console.log('Rodando na porta 3000');
