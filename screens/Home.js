@@ -8,10 +8,10 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  TouchableOpacity // <-- IMPORTAMOS ISSO AQUI
+  TouchableOpacity
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; // <-- E ISSO AQUI
+import { useNavigation } from "@react-navigation/native";
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -21,7 +21,6 @@ export default function Home() {
   
   const [recomendados, setRecomendados] = useState([]);
 
-  // <-- INICIAMOS A NAVEGAÇÃO AQUI
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -116,11 +115,13 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {feed.map((item, index) => (
-            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
             <TouchableOpacity 
               key={index} 
               style={styles.cardItem}
-              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}
+              onPress={() => {
+                console.log("=== CLICOU NO FEED ID: ===", item.id_jogo || item.id);
+                navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id });
+              }}
             >
               <Image
                 source={{
@@ -162,11 +163,13 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {jogosPopulares.map((item, index) => (
-            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
             <TouchableOpacity 
               key={index} 
               style={styles.cardItem}
-              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+              onPress={() => {
+                console.log("=== CLICOU NO EM ALTA ID: ===", item.id);
+                navigation.navigate("DetalhesJogo", { id: item.id });
+              }}
             >
               <Image source={{ uri: item.foto_capa }} style={styles.game} />
               <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
@@ -177,7 +180,6 @@ export default function Home() {
         </ScrollView>
       )}
 
-      {/* NOVA SEÇÃO: RECOMENDADOS */}
       <Text style={styles.sectionTitle}>Recomendados para você</Text>
       {recomendados.length > 0 ? (
         <ScrollView
@@ -187,11 +189,13 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {recomendados.map((item, index) => (
-            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
             <TouchableOpacity 
               key={index} 
               style={styles.cardItem}
-              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+              onPress={() => {
+                console.log("=== CLICOU NO RECOMENDADOS ID: ===", item.id);
+                navigation.navigate("DetalhesJogo", { id: item.id });
+              }}
             >
               <Image source={{ uri: item.foto_capa }} style={styles.game} />
               <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
@@ -206,7 +210,6 @@ export default function Home() {
         </Text>
       )}
       
-      {/* Respiro no final da tela para não encostar na barra inferior */}
       <View style={{ height: 40 }} />
     </ScrollView>
   );
