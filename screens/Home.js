@@ -18,11 +18,15 @@ export default function Home() {
   const [feed, setFeed] = useState([]);
   const [jogosPopulares, setJogosPopulares] = useState([]);
   const [carregandoJogos, setCarregandoJogos] = useState(true);
-  
   const [recomendados, setRecomendados] = useState([]);
+  
+  // NOVOS ESTADOS PARA A BUSCA
+  const [resultadosBusca, setResultadosBusca] = useState([]);
+  const [buscando, setBuscando] = useState(false);
 
   const navigation = useNavigation();
 
+  // Efeito original (carrega Feed e Recomendações)
   useEffect(() => {
     const carregarDadosDoUsuario = async () => {
       try {
@@ -41,13 +45,8 @@ export default function Home() {
           })
         ]);
 
-        if (resFeed.ok) {
-          setFeed(await resFeed.json());
-        }
-        
-        if (resRecs.ok) {
-          setRecomendados(await resRecs.json());
-        }
+        if (resFeed.ok) setFeed(await resFeed.json());
+        if (resRecs.ok) setRecomendados(await resRecs.json());
 
       } catch (erro) {
         console.log("Erro de conexão nos dados do usuário:", erro);
@@ -57,6 +56,7 @@ export default function Home() {
     carregarDadosDoUsuario();
   }, []);
 
+  // Efeito original (carrega Em Alta)
   useEffect(() => {
     async function buscarJogosPopulares() {
         try {
@@ -71,6 +71,31 @@ export default function Home() {
     }
     buscarJogosPopulares();
   }, []);
+
+  // NOVO EFEITO: Ouve a barra de pesquisa
+  useEffect(() => {
+    if (search.trim() === "") {
+      setResultadosBusca([]);
+      return;
+    }
+
+    setBuscando(true);
+    
+    // Aguarda 500ms antes de bater no banco para não sobrecarregar
+    const timer = setTimeout(async () => {
+      try {
+        const resposta = await fetch(`https://playdex-yh18.onrender.com/jogos/busca?q=${search}`);
+        const dados = await resposta.json();
+        setResultadosBusca(dados);
+      } catch (erro) {
+        console.error("Erro na busca de jogos:", erro);
+      } finally {
+        setBuscando(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const renderIconeStatus = (status) => {
     if (status === 'Jogando') return <Ionicons name="game-controller" size={16} color="#FFFFFF" />;
@@ -105,109 +130,134 @@ export default function Home() {
         </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Atividade de amigos</Text>
-      
-      {feed.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollWrapper}
-          contentContainerStyle={styles.scrollContainer}
-        >
-          {feed.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.cardItem}
-              onPress={() => {
-                console.log("=== CLICOU NO FEED ID: ===", item.id_jogo || item.id);
-                navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id });
-              }}
-            >
-              <Image
-                source={{
-                  uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
+      {/* RENDERIZAÇÃO CONDICIONAL: Mostra a busca se tiver texto, senão mostra a Home normal */}
+      {search.trim().length > 0 ? (
+        <View style={styles.resultadosContainer}>
+          <Text style={styles.sectionTitle}>Resultados para "{search}"</Text>
+          
+          {buscando ? (
+            <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
+          ) : resultadosBusca.length > 0 ? (
+            resultadosBusca.map((item) => (
+              <TouchableOpacity 
+                key={item.id} 
+                style={styles.cardBusca}
+                onPress={() => {
+                  setSearch(""); // Limpa a barra de pesquisa
+                  navigation.navigate("DetalhesJogo", { id: item.id });
                 }}
-                style={styles.game}
-              />
-              <View style={styles.activityInfo}>
-                <Image
-                  source={{
-                    uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
-                  }}
-                  style={styles.player}
+              >
+                <Image 
+                  source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
+                  style={styles.capaBusca} 
                 />
-                <View style={styles.nomeEIcone}>
-                  <Text style={styles.playerName} numberOfLines={1}>
-                    {item.username}
+                <Text style={styles.tituloBusca}>{item.titulo}</Text>
+                <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.textoVazio}>Nenhum jogo encontrado com esse nome.</Text>
+          )}
+        </View>
+      ) : (
+        <>
+          {/* SEÇÃO NORMAL DA HOME */}
+          <Text style={styles.sectionTitle}>Atividade de amigos</Text>
+          
+          {feed.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.scrollWrapper}
+              contentContainerStyle={styles.scrollContainer}
+            >
+              {feed.map((item, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.cardItem}
+                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}
+                >
+                  <Image
+                    source={{
+                      uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
+                    }}
+                    style={styles.game}
+                  />
+                  <View style={styles.activityInfo}>
+                    <Image
+                      source={{
+                        uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
+                      }}
+                      style={styles.player}
+                    />
+                    <View style={styles.nomeEIcone}>
+                      <Text style={styles.playerName} numberOfLines={1}>
+                        {item.username}
+                      </Text>
+                      {renderIconeStatus(item.status)}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.textoVazio}>
+              Você ainda não adicionou amigos ou eles não possuem atividades recentes.
+            </Text>
+          )}
+
+          <Text style={styles.sectionTitle}>Em Alta</Text>
+          {carregandoJogos ? (
+            <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.scrollWrapper}
+              contentContainerStyle={styles.scrollContainer}
+            >
+              {jogosPopulares.map((item, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.cardItem}
+                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+                >
+                  <Image source={{ uri: item.foto_capa }} style={styles.game} />
+                  <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
+                    {item.titulo}
                   </Text>
-                  {renderIconeStatus(item.status)}
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      ) : (
-        <Text style={styles.textoVazio}>
-          Você ainda não adicionou amigos ou eles não possuem atividades recentes.
-        </Text>
-      )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
 
-      <Text style={styles.sectionTitle}>Em Alta</Text>
-      {carregandoJogos ? (
-        <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
-      ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollWrapper}
-          contentContainerStyle={styles.scrollContainer}
-        >
-          {jogosPopulares.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.cardItem}
-              onPress={() => {
-                console.log("=== CLICOU NO EM ALTA ID: ===", item.id);
-                navigation.navigate("DetalhesJogo", { id: item.id });
-              }}
+          <Text style={styles.sectionTitle}>Recomendados para você</Text>
+          {recomendados.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.scrollWrapper}
+              contentContainerStyle={styles.scrollContainer}
             >
-              <Image source={{ uri: item.foto_capa }} style={styles.game} />
-              <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
-                {item.titulo}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
-
-      <Text style={styles.sectionTitle}>Recomendados para você</Text>
-      {recomendados.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollWrapper}
-          contentContainerStyle={styles.scrollContainer}
-        >
-          {recomendados.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.cardItem}
-              onPress={() => {
-                console.log("=== CLICOU NO RECOMENDADOS ID: ===", item.id);
-                navigation.navigate("DetalhesJogo", { id: item.id });
-              }}
-            >
-              <Image source={{ uri: item.foto_capa }} style={styles.game} />
-              <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
-                {item.titulo}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      ) : (
-        <Text style={styles.textoVazio}>
-          Adicione um jogo aos favoritos no seu Perfil para receber recomendações personalizadas!
-        </Text>
+              {recomendados.map((item, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.cardItem}
+                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+                >
+                  <Image source={{ uri: item.foto_capa }} style={styles.game} />
+                  <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
+                    {item.titulo}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.textoVazio}>
+              Adicione um jogo aos favoritos no seu Perfil para receber recomendações personalizadas!
+            </Text>
+          )}
+        </>
       )}
       
       <View style={{ height: 40 }} />
@@ -318,5 +368,29 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 16,
     marginBottom: 20,
-  }
+  },
+  // ESTILOS NOVOS DA BUSCA
+  resultadosContainer: {
+    marginTop: 10,
+  },
+  cardBusca: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1C1C1C',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  capaBusca: {
+    width: 50,
+    height: 68,
+    borderRadius: 6,
+    marginRight: 15,
+  },
+  tituloBusca: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    flex: 1,
+  },
 });
