@@ -54,7 +54,7 @@ export default function Jogo() {
           key={i} 
           name={i <= Math.round(media) ? "star" : "star-outline"} 
           size={18} 
-          color="#FFD700" 
+          color="#00BEBE" 
           style={{ marginRight: 4 }}
         />
       );
