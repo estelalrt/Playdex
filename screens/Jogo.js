@@ -77,6 +77,12 @@ export default function Jogo() {
           locations={[0, 0.5, 0.95, 1]} 
           style={StyleSheet.absoluteFillObject}
         />
+        <TouchableOpacity 
+          style={styles.botaoVoltar} 
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+        </TouchableOpacity>
       </ImageBackground>
       
       <View style={styles.containerInferior}>
