@@ -84,7 +84,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="Jogo" component={Jogo} />
+        <Stack.Screen name="DetalhesJogo" component={Jogo} />
         
       </Stack.Navigator>
     </NavigationContainer>
