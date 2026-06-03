@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   notaTexto: {
-    color: '#FFD700', 
+    color: '#00BEBE', 
     fontSize: 18,
     fontWeight: 'bold',
     marginRight: 8,
