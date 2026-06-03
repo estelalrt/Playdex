@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   lerMais: {
-    color: '#5012FF', // A sua cor roxa para indicar que é clicável
+    color: '#ffffff', // A sua cor roxa para indicar que é clicável
     fontSize: 14,
     fontWeight: 'bold',
     marginTop: 6,
