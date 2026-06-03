@@ -7,8 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Jogo() {
   const [jogo, setJogo] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  
-  // NOVO ESTADO: Controla se a sinopse está expandida ou não
   const [expandido, setExpandido] = useState(false);
   
   const route = useRoute();
@@ -54,7 +52,7 @@ export default function Jogo() {
           key={i} 
           name={i <= Math.round(media) ? "star" : "star-outline"} 
           size={18} 
-          color="#00BEBE" 
+          color="#FFD700" 
           style={{ marginRight: 4 }}
         />
       );
@@ -64,21 +62,26 @@ export default function Jogo() {
 
   return (
     <ScrollView style={styles.container} bounces={false}>
+      {/* Imagem agora com resizeMode "cover" pra garantir que preencha as laterais */}
       <ImageBackground 
         source={{ uri: jogo.foto_fundo || jogo.foto_capa }} 
         style={styles.imagemFundo}
+        resizeMode="cover"
       >
+        {/* O SEGREDO AQUI: O degradê agora cobre a imagem toda de forma absoluta */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.8)', '#000000']}
-          style={styles.gradiente}
+          colors={['transparent', 'rgba(0,0,0,0.6)', '#000000']}
+          locations={[0.3, 0.7, 1]} // Garante que a transição comece no meio e termine 100% preta
+          style={StyleSheet.absoluteFillObject}
+        />
+        
+        {/* O botão fica flutuando por cima do degradê */}
+        <TouchableOpacity 
+          style={styles.botaoVoltar} 
+          onPress={() => navigation.goBack()}
         >
-          <TouchableOpacity 
-            style={styles.botaoVoltar} 
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
-          </TouchableOpacity>
-        </LinearGradient>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+        </TouchableOpacity>
       </ImageBackground>
       
       <View style={styles.containerInferior}>
@@ -109,17 +112,14 @@ export default function Jogo() {
             </TouchableOpacity>
          </View>
          
-         {/* ÁREA DA SINOPSE ATUALIZADA */}
          <Text style={styles.sinopseTitulo}>Sinopse</Text>
          <Text 
            style={styles.sinopseTexto}
-           // Se estiver expandido, mostra tudo (undefined), se não, corta em 3 linhas
            numberOfLines={expandido ? undefined : 3}
          >
            {jogo.sinopse || "Sinopse não disponível."}
          </Text>
 
-         {/* Só mostra o botão "Ler mais" se existir uma sinopse grande o suficiente */}
          {jogo.sinopse && jogo.sinopse.length > 120 && (
            <TouchableOpacity onPress={() => setExpandido(!expandido)}>
              <Text style={styles.lerMais}>
@@ -147,11 +147,7 @@ const styles = StyleSheet.create({
   },
   imagemFundo: {
     width: '100%',
-    height: 480, 
-  },
-  gradiente: {
-    flex: 1,
-    justifyContent: 'flex-start', 
+    height: 500, // Aumentei um pouco para dar mais espaço pro degradê trabalhar
   },
   botaoVoltar: {
     marginTop: 50, 
@@ -163,8 +159,8 @@ const styles = StyleSheet.create({
   },
   containerInferior: {
     paddingHorizontal: 24,
-    backgroundColor: '#000000',
-    marginTop: -80, 
+    backgroundColor: 'transparent', // <-- AQUI! Tiramos a linha preta dura
+    marginTop: -100, // Puxa o texto pra cima da área onde o degradê já está pretão
   },
   titulo: {
     color: '#FFF',
@@ -184,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   notaTexto: {
-    color: '#00BEBE', 
+    color: '#FFD700', 
     fontSize: 18,
     fontWeight: 'bold',
     marginRight: 8,
@@ -232,7 +228,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   lerMais: {
-    color: '#ffffff', // A sua cor roxa para indicar que é clicável
+    color: '#5012FF', 
     fontSize: 14,
     fontWeight: 'bold',
     marginTop: 6,
