@@ -7,9 +7,11 @@ import {
   Image,
   TextInput,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableOpacity // <-- IMPORTAMOS ISSO AQUI
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; // <-- E ISSO AQUI
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -17,17 +19,17 @@ export default function Home() {
   const [jogosPopulares, setJogosPopulares] = useState([]);
   const [carregandoJogos, setCarregandoJogos] = useState(true);
   
-  // Estado para as recomendações
   const [recomendados, setRecomendados] = useState([]);
 
-  // 1. CARREGA DADOS QUE DEPENDEM DO USUÁRIO LOGADO (Feed e Recomendações)
+  // <-- INICIAMOS A NAVEGAÇÃO AQUI
+  const navigation = useNavigation();
+
   useEffect(() => {
     const carregarDadosDoUsuario = async () => {
       try {
         const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
         if (!usuarioSalvo) return;
 
-        // Dispara os dois pedidos ao mesmo tempo para ser mais rápido!
         const urlFeed = `https://playdex-yh18.onrender.com/feed/${usuarioSalvo}`;
         const urlRecs = `https://playdex-yh18.onrender.com/recomendacoes/${usuarioSalvo}`;
 
@@ -56,7 +58,6 @@ export default function Home() {
     carregarDadosDoUsuario();
   }, []);
 
-  // 2. CARREGA JOGOS POPULARES (Não depende de login)
   useEffect(() => {
     async function buscarJogosPopulares() {
         try {
@@ -115,7 +116,12 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {feed.map((item, index) => (
-            <View key={index} style={styles.cardItem}>
+            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
+            <TouchableOpacity 
+              key={index} 
+              style={styles.cardItem}
+              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}
+            >
               <Image
                 source={{
                   uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
@@ -136,7 +142,7 @@ export default function Home() {
                   {renderIconeStatus(item.status)}
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       ) : (
@@ -156,12 +162,17 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {jogosPopulares.map((item, index) => (
-            <View key={index} style={styles.cardItem}>
+            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
+            <TouchableOpacity 
+              key={index} 
+              style={styles.cardItem}
+              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+            >
               <Image source={{ uri: item.foto_capa }} style={styles.game} />
               <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
                 {item.titulo}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       )}
@@ -176,12 +187,17 @@ export default function Home() {
           contentContainerStyle={styles.scrollContainer}
         >
           {recomendados.map((item, index) => (
-            <View key={index} style={styles.cardItem}>
+            // <-- TROCAMOS "View" POR "TouchableOpacity" COM NAVEGAÇÃO
+            <TouchableOpacity 
+              key={index} 
+              style={styles.cardItem}
+              onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+            >
               <Image source={{ uri: item.foto_capa }} style={styles.game} />
               <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
                 {item.titulo}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
       ) : (
