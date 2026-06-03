@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function DetalhesJogo() {
+export default function Jogo() {
   const [jogo, setJogo] = useState(null);
   const [carregando, setCarregando] = useState(true);
   
+  // NOVO ESTADO: Controla se a sinopse está expandida ou não
+  const [expandido, setExpandido] = useState(false);
+  
   const route = useRoute();
   const navigation = useNavigation();
-  
-  // Pega o ID que você enviou lá da Home!
   const { id } = route.params; 
 
   useEffect(() => {
     async function buscarDetalhes() {
       try {
-        // Chama a rota que configuramos no backend
         const resposta = await fetch(`https://playdex-yh18.onrender.com/jogo/${id}`);
         const dados = await resposta.json();
         setJogo(dados);
@@ -27,7 +27,6 @@ export default function DetalhesJogo() {
         setCarregando(false);
       }
     }
-
     buscarDetalhes();
   }, [id]);
 
@@ -47,9 +46,24 @@ export default function DetalhesJogo() {
     );
   }
 
+  const renderEstrelas = (media) => {
+    const estrelas = [];
+    for (let i = 1; i <= 5; i++) {
+      estrelas.push(
+        <Ionicons 
+          key={i} 
+          name={i <= Math.round(media) ? "star" : "star-outline"} 
+          size={18} 
+          color="#FFD700" 
+          style={{ marginRight: 4 }}
+        />
+      );
+    }
+    return estrelas;
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Imagem de Fundo cobrindo metade da tela */}
+    <ScrollView style={styles.container} bounces={false}>
       <ImageBackground 
         source={{ uri: jogo.foto_fundo || jogo.foto_capa }} 
         style={styles.imagemFundo}
@@ -58,27 +72,65 @@ export default function DetalhesJogo() {
           colors={['transparent', 'rgba(0,0,0,0.8)', '#000000']}
           style={styles.gradiente}
         >
-          {/* Botão de Voltar */}
           <TouchableOpacity 
             style={styles.botaoVoltar} 
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="#FFF" />
           </TouchableOpacity>
-
-          {/* Título do Jogo */}
-          <View style={styles.conteudoInfos}>
-            <Text style={styles.titulo}>{jogo.titulo}</Text>
-          </View>
         </LinearGradient>
       </ImageBackground>
       
-      {/* Parte de baixo da tela (Sinopse, etc) */}
       <View style={styles.containerInferior}>
+         <Text style={styles.titulo}>{jogo.titulo}</Text>
+         
+         <Text style={styles.metadados}>
+           {jogo.ano_lancamento || '2025'} • {jogo.classificacao || '+18'} • {jogo.genero || 'Gênero não informado'}
+         </Text>
+
+         <View style={styles.containerAvaliacao}>
+            <Text style={styles.notaTexto}>{jogo.media_nota ? jogo.media_nota.replace('.', ',') : '0,0'}</Text>
+            <View style={styles.estrelas}>
+              {renderEstrelas(jogo.media_nota || 0)}
+            </View>
+         </View>
+
+         <View style={styles.botoesAcao}>
+            <TouchableOpacity style={styles.botaoAvaliar}>
+              <Text style={styles.textoBotaoAvaliar}>Avaliar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.botaoIcone}>
+              <Ionicons name="game-controller-outline" size={20} color="#FFF" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.botaoIcone}>
+              <Ionicons name="bookmark-outline" size={20} color="#FFF" />
+            </TouchableOpacity>
+         </View>
+         
+         {/* ÁREA DA SINOPSE ATUALIZADA */}
          <Text style={styles.sinopseTitulo}>Sinopse</Text>
-         <Text style={styles.sinopseTexto}>{jogo.sinopse || "Sinopse não disponível."}</Text>
+         <Text 
+           style={styles.sinopseTexto}
+           // Se estiver expandido, mostra tudo (undefined), se não, corta em 3 linhas
+           numberOfLines={expandido ? undefined : 3}
+         >
+           {jogo.sinopse || "Sinopse não disponível."}
+         </Text>
+
+         {/* Só mostra o botão "Ler mais" se existir uma sinopse grande o suficiente */}
+         {jogo.sinopse && jogo.sinopse.length > 120 && (
+           <TouchableOpacity onPress={() => setExpandido(!expandido)}>
+             <Text style={styles.lerMais}>
+               {expandido ? "Ler menos" : "Ler mais"}
+             </Text>
+           </TouchableOpacity>
+         )}
+
+         <View style={{ height: 40 }} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -95,37 +147,82 @@ const styles = StyleSheet.create({
   },
   imagemFundo: {
     width: '100%',
-    height: 450, // Ajuste conforme a altura que preferir
+    height: 480, 
   },
   gradiente: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start', 
   },
   botaoVoltar: {
-    marginTop: 50, // Ajuste para a Status Bar do celular
+    marginTop: 50, 
     marginLeft: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.15)', 
     borderRadius: 20,
-    padding: 8,
+    padding: 10,
     alignSelf: 'flex-start',
   },
-  conteudoInfos: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+  containerInferior: {
+    paddingHorizontal: 24,
+    backgroundColor: '#000000',
+    marginTop: -80, 
   },
   titulo: {
     color: '#FFF',
-    fontSize: 32,
+    fontSize: 36, 
     fontWeight: 'bold',
+    marginBottom: 10,
+    lineHeight: 40,
   },
-  containerInferior: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#000000',
+  metadados: {
+    color: '#6F6F6F',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  containerAvaliacao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  notaTexto: {
+    color: '#FFD700', 
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  estrelas: {
+    flexDirection: 'row',
+  },
+  botoesAcao: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  botaoAvaliar: {
+    flex: 1, 
+    backgroundColor: '#5012FF',
+    borderRadius: 30,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  textoBotaoAvaliar: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  botaoIcone: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#1C1C1C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
   },
   sinopseTitulo: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
   },
@@ -133,5 +230,11 @@ const styles = StyleSheet.create({
     color: '#B3B3B3',
     fontSize: 14,
     lineHeight: 22,
+  },
+  lerMais: {
+    color: '#5012FF', // A sua cor roxa para indicar que é clicável
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 6,
   },
 });

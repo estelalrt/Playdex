@@ -169,7 +169,13 @@ class UsuarioDAO {
     }
 
     async buscarJogoPorId(id) {
-        const sql = 'SELECT * FROM jogo WHERE id = $1';
+        const sql = `
+          SELECT 
+            j.*, 
+            COALESCE((SELECT ROUND(AVG(nota), 1) FROM atividade WHERE id_jogo = j.id), 0) AS media_nota
+          FROM jogo j 
+          WHERE j.id = $1
+        `;
         const resultado = await pool.query(sql, [id]);
         return resultado.rows[0];
     }
