@@ -75,7 +75,11 @@ function MainTabs() {
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer
+    documentTitle={{
+        formatter: () => 'Playdex' // <--- ISSO AQUI FORÇA O NOME DA ABA!
+      }}
+    >
       <Stack.Navigator
         initialRouteName="Welcome" 
         screenOptions={{ headerShown: false }}
