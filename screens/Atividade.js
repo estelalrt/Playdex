@@ -9,13 +9,11 @@ import {
   Image,
   Keyboard,
   Alert,
-  Platform // <-- IMPORTAMOS O PLATFORM AQUI
+  Platform
 } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-
-// <-- IMPORTAMOS O CALENDÁRIO AQUI
 import DateTimePicker from '@react-native-community/datetimepicker'; 
 
 export default function Atividade() {
@@ -26,12 +24,18 @@ export default function Atividade() {
 
   const [status, setStatus] = useState("");
   const [duracao, setDuracao] = useState("");
-  const [data, setData] = useState("");
   const [nota, setNota] = useState(0);
   const [review, setReview] = useState("");
-  
-  // <-- NOVO ESTADO PARA MOSTRAR/ESCONDER O CALENDÁRIO
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
+  
+  // <-- JÁ INICIA COM A DATA DE HOJE AUTOMATICAMENTE!
+  const [data, setData] = useState(() => {
+    const hoje = new Date();
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const ano = hoje.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  });
 
   const buscarJogos = async (texto) => {
     setQuery(texto);
@@ -98,7 +102,7 @@ export default function Atividade() {
         id_jogo: jogoSelecionado.id,
         status: status,
         duracao: duracao ? parseFloat(duracao.replace(',', '.')) : 0,
-        nota: status === "Jogando" ? null : nota,
+        nota: status === "Concluído" ? nota : null,
         data: dataBanco,
         review: review.trim() !== "" ? review : null,
       };
@@ -117,13 +121,6 @@ export default function Atividade() {
 
       if (resposta.ok) {
         Alert.alert("Sucesso!", "Atividade registrada.");
-        setJogoSelecionado(null);
-        setStatus("");
-        setDuracao("");
-        setData("");
-        setNota(0);
-        setReview("");
-        setQuery("");
         navigation.goBack();
       } else {
         const erro = await resposta.json();
@@ -142,8 +139,11 @@ export default function Atividade() {
         style={[styles.botaoStatus, isAtivo && styles.botaoStatusAtivo]}
         onPress={() => {
           setStatus(nome);
-          if (nome === "Jogando") setNota(0);
-          if (nome === "Quero Jogar") setReview(""); 
+          if (nome !== "Concluído") setNota(0); // Só guarda nota se for Concluído
+          if (nome === "Quero Jogar") {
+             setReview(""); 
+             setDuracao("");
+          }
         }}
       >
         <Ionicons
@@ -184,7 +184,6 @@ export default function Atividade() {
     );
   };
 
-  // <-- FUNÇÃO PARA CONVERTER A DATA STRING EM OBJETO PRO CALENDÁRIO
   const getDataParaCalendario = () => {
     if (data.length === 10) {
       const partes = data.split('/');
@@ -247,7 +246,6 @@ export default function Atividade() {
           )}
         </View>
 
-        {/* NOVA ÁREA DA DATA MISTA (WEB vs CELULAR) */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Data da Atividade</Text>
           
@@ -276,13 +274,12 @@ export default function Atividade() {
             </TouchableOpacity>
           )}
 
-          {/* O COMPONENTE NATIVO DO CALENDÁRIO */}
           {mostrarCalendario && Platform.OS !== 'web' && (
             <DateTimePicker
               value={getDataParaCalendario()}
               mode="date"
               display="default"
-              maximumDate={new Date()} // Trava para não escolher dias no futuro
+              maximumDate={new Date()}
               onChange={(evento, dataSelecionada) => {
                 setMostrarCalendario(false);
                 if (dataSelecionada) {
@@ -305,24 +302,28 @@ export default function Atividade() {
           </View>
         </View>
 
-        {status !== "Jogando" && (
+        {/* <-- SÓ MOSTRA ESTRELAS SE FOR CONCLUÍDO */}
+        {status === "Concluído" && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Avaliação</Text>
             {renderEstrelas()}
           </View>
         )}
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Tempo Jogado</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Duração em horas"
-            placeholderTextColor="#6F6F6F"
-            value={duracao}
-            onChangeText={setDuracao}
-            keyboardType="numeric"
-          />
-        </View>
+        {/* <-- ESCONDE O TEMPO JOGADO SE FOR QUERO JOGAR */}
+        {status !== "Quero Jogar" && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Tempo Jogado</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Duração em horas"
+              placeholderTextColor="#6F6F6F"
+              value={duracao}
+              onChangeText={setDuracao}
+              keyboardType="numeric"
+            />
+          </View>
+        )}
 
         {status !== "Quero Jogar" && (
           <View style={styles.inputContainer}>
@@ -407,7 +408,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#FFFFFF",
     fontSize: 16,
-    // Alineamento específico pro Texto ficar centralizado com o ícone no Mobile
     textAlignVertical: "center", 
   },
   button: {
