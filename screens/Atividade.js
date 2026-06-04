@@ -82,12 +82,40 @@ export default function Atividade() {
       return;
     }
     if (!data || data.length < 10) {
-      Alert.alert("Erro", "Por favor, introduza uma data válida!");
+      Alert.alert("Erro", "Por favor, digite a data completa (DD/MM/AAAA)!");
       return;
     }
 
+    // --- NOVA TRAVA DE SEGURANÇA DA DATA ---
+    const partesData = data.split('/');
+    const dia = parseInt(partesData[0], 10);
+    const mes = parseInt(partesData[1], 10);
+    const ano = parseInt(partesData[2], 10);
+
+    // O JavaScript cria a data. Se passarmos 30 de fevereiro, ele avança para março sozinho.
+    const dataDigitada = new Date(ano, mes - 1, dia); 
+    const dataDeHoje = new Date();
+
+    // Comparamos o que o usuário digitou com o que o JS interpretou para pegar datas falsas
+    if (
+      dataDigitada.getFullYear() !== ano ||
+      dataDigitada.getMonth() !== mes - 1 ||
+      dataDigitada.getDate() !== dia
+    ) {
+      Alert.alert("Data Inválida", "Essa data não existe no calendário. Verifique o dia e o mês.");
+      return;
+    }
+
+    // Barra atividades no futuro
+    if (dataDigitada > dataDeHoje) {
+      Alert.alert("Viajante do Tempo?", "Você não pode registrar uma atividade no futuro!");
+      return;
+    }
+    // --- FIM DA TRAVA DE SEGURANÇA ---
+
     try {
       const usuarioLogado = await AsyncStorage.getItem("usuarioLogado");
+      // ... (O RESTO DO SEU CÓDIGO CONTINUA IGUAL DAQUI PRA BAIXO) ...
 
       let dataBanco = data;
       if (data.includes('/')) {

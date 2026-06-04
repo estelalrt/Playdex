@@ -11,25 +11,38 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Adicionado o AsyncStorage aqui!
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
 export default function Cadastro() {
   const navigation = useNavigation();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); // <-- Sua variável se chama password!
   const [showPassword, setShowPassword] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
   const handleRegister = async () => {
-    // 1. Primeiro verifica se tudo está preenchido
+    // 1. Verifica se tudo está preenchido (só precisamos de um IF para isso)
     if (!nome || !email || !username || !password) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
 
-    // 2. Tudo certo? Liga o carregamento e trava o botão!
+    // --- NOVA TRAVA DE SEGURANÇA DA SENHA ---
+    // Usamos a variável 'password' aqui para testar com Regex
+    const temLetra = /[a-zA-Z]/.test(password); 
+    const temNumero = /[0-9]/.test(password);   
+
+    if (password.length < 6 || !temLetra || !temNumero) {
+      Alert.alert(
+        "Senha Fraca", 
+        "Sua senha precisa ter pelo menos 6 caracteres e misturar letras e números para sua segurança."
+      );
+      return;
+    }
+    // --- FIM DA TRAVA DE SEGURANÇA ---
+
     setCarregando(true);
 
     try {
@@ -56,7 +69,6 @@ export default function Cadastro() {
     } catch (erro) {
       Alert.alert("Erro", "Não foi possível conectar ao servidor.");
     } finally {
-      // 3. Desliga o carregamento, não importa o que aconteça no final
       setCarregando(false);
     }
   };
@@ -142,7 +154,7 @@ export default function Cadastro() {
       <TouchableOpacity 
         style={[styles.button, carregando && { opacity: 0.7 }]} 
         onPress={handleRegister}
-        disabled={carregando} // Impede cliques extras enquanto a requisição acontece
+        disabled={carregando} 
       >
         {carregando ? (
           <ActivityIndicator size="small" color="#FFFFFF" />
