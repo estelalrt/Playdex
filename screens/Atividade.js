@@ -9,11 +9,14 @@ import {
   Image,
   Keyboard,
   Alert,
+  Platform // <-- IMPORTAMOS O PLATFORM AQUI
 } from "react-native";
-// Adicionamos o FontAwesome aqui nos imports!
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+
+// <-- IMPORTAMOS O CALENDÁRIO AQUI
+import DateTimePicker from '@react-native-community/datetimepicker'; 
 
 export default function Atividade() {
   const [query, setQuery] = useState("");
@@ -26,6 +29,9 @@ export default function Atividade() {
   const [data, setData] = useState("");
   const [nota, setNota] = useState(0);
   const [review, setReview] = useState("");
+  
+  // <-- NOVO ESTADO PARA MOSTRAR/ESCONDER O CALENDÁRIO
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   const buscarJogos = async (texto) => {
     setQuery(texto);
@@ -71,8 +77,8 @@ export default function Atividade() {
       Alert.alert("Erro", "Selecione um status para o jogo!");
       return;
     }
-    if (!data) {
-      Alert.alert("Erro", "Por favor, introduza a data da atividade!");
+    if (!data || data.length < 10) {
+      Alert.alert("Erro", "Por favor, introduza uma data válida!");
       return;
     }
 
@@ -121,7 +127,7 @@ export default function Atividade() {
         navigation.goBack();
       } else {
         const erro = await resposta.json();
-        Alert.alert("Ops!", erro.mensagem || "Deu algum erro no servidor.");
+        Alert.alert("Ops!", erro.error || erro.mensagem || "Deu algum erro no servidor.");
       }
     } catch (erro) {
       console.log("Erro de conexão:", erro);
@@ -156,7 +162,6 @@ export default function Atividade() {
     return (
       <View style={styles.estrelasContainer}>
         {[1, 2, 3, 4, 5].map((posicao) => {
-          // Nomes dos ícones do FontAwesome
           let iconName = "star-o"; 
           if (nota >= posicao) iconName = "star";
           else if (nota >= posicao - 0.5) iconName = "star-half-o";
@@ -171,13 +176,21 @@ export default function Atividade() {
                 style={styles.metadeDireita}
                 onPress={() => setNota(posicao)}
               />
-              {/* Trocado para FontAwesome com um tamanho um pouco ajustado */}
               <FontAwesome name={iconName} size={38} color="#00BEBE" />
             </View>
           );
         })}
       </View>
     );
+  };
+
+  // <-- FUNÇÃO PARA CONVERTER A DATA STRING EM OBJETO PRO CALENDÁRIO
+  const getDataParaCalendario = () => {
+    if (data.length === 10) {
+      const partes = data.split('/');
+      return new Date(`${partes[2]}-${partes[1]}-${partes[0]}T12:00:00`);
+    }
+    return new Date();
   };
 
   return (
@@ -234,20 +247,53 @@ export default function Atividade() {
           )}
         </View>
 
+        {/* NOVA ÁREA DA DATA MISTA (WEB vs CELULAR) */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Data da Atividade</Text>
-          <View style={styles.inputComIcone}>
-            <TextInput
-              style={styles.inputTransparente}
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor="#6F6F6F"
-              value={data}
-              onChangeText={handleDataFormatada}
-              keyboardType="numeric"
-              maxLength={10}
+          
+          {Platform.OS === 'web' ? (
+            <View style={styles.inputComIcone}>
+              <TextInput
+                style={styles.inputTransparente}
+                placeholder="DD/MM/AAAA"
+                placeholderTextColor="#6F6F6F"
+                value={data}
+                onChangeText={handleDataFormatada}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <Ionicons name="calendar" size={24} color="#6F6F6F" />
+            </View>
+          ) : (
+            <TouchableOpacity 
+              style={styles.inputComIcone} 
+              onPress={() => setMostrarCalendario(true)}
+            >
+              <Text style={[styles.textoDataFlutuante, !data && { color: "#6F6F6F" }]}>
+                {data || "DD/MM/AAAA"}
+              </Text>
+              <Ionicons name="calendar" size={24} color="#6F6F6F" />
+            </TouchableOpacity>
+          )}
+
+          {/* O COMPONENTE NATIVO DO CALENDÁRIO */}
+          {mostrarCalendario && Platform.OS !== 'web' && (
+            <DateTimePicker
+              value={getDataParaCalendario()}
+              mode="date"
+              display="default"
+              maximumDate={new Date()} // Trava para não escolher dias no futuro
+              onChange={(evento, dataSelecionada) => {
+                setMostrarCalendario(false);
+                if (dataSelecionada) {
+                  const dia = String(dataSelecionada.getDate()).padStart(2, '0');
+                  const mes = String(dataSelecionada.getMonth() + 1).padStart(2, '0');
+                  const ano = dataSelecionada.getFullYear();
+                  setData(`${dia}/${mes}/${ano}`);
+                }
+              }}
             />
-            <Ionicons name="calendar" size={24} color="#6F6F6F" />
-          </View>
+          )}
         </View>
 
         <View style={styles.inputContainer}>
@@ -356,6 +402,13 @@ const styles = StyleSheet.create({
     outlineStyle: "none",
     borderWidth: 0,
     height: "100%",
+  },
+  textoDataFlutuante: {
+    flex: 1,
+    color: "#FFFFFF",
+    fontSize: 16,
+    // Alineamento específico pro Texto ficar centralizado com o ícone no Mobile
+    textAlignVertical: "center", 
   },
   button: {
     backgroundColor: "#5012FF",
