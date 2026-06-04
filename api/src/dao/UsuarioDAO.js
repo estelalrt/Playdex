@@ -105,6 +105,18 @@ class UsuarioDAO {
         await pool.query(sql, valores);
     }
 
+    async verificarAtividadeDuplicada(username, id_jogo, status) {
+        const sql = `
+          SELECT id FROM atividade 
+          WHERE id_usuario = (SELECT id FROM usuario WHERE username = $1) 
+          AND id_jogo = $2 
+          AND status = $3
+        `;
+        const resultado = await pool.query(sql, [username, id_jogo, status]);
+        // Se achou alguma coisa, retorna o registro. Se não achou, retorna undefined.
+        return resultado.rows[0]; 
+    }
+
     async pegarJogosEmAlta() {
     try {
       // Ajustamos 'jogos' para 'jogo' (singular)

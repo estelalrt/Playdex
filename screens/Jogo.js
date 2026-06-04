@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,8 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Jogo() {
   const [jogo, setJogo] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  
-  // NOVO ESTADO: Controla se a sinopse está expandida ou não
   const [expandido, setExpandido] = useState(false);
   
   const route = useRoute();
@@ -63,78 +61,81 @@ export default function Jogo() {
   };
 
   return (
-    <ScrollView style={styles.container} bounces={false}>
-      <ImageBackground 
-        source={{ uri: jogo.foto_fundo || jogo.foto_capa }} 
-        style={styles.imagemFundo}
-      >
-        {/* O SEGREDO AQUI: Criamos uma zona de segurança no final */}
-        <LinearGradient
-          // Repetimos o #000000 no final para garantir a cor sólida
-          colors={['transparent', 'rgba(0,0,0,0.8)', '#000000', '#000000']}
-          // 0.95 significa que ele chega no preto total aos 95% da imagem, 
-          // e os últimos 5% da foto ficam puramente pretos, matando a linha dura!
-          locations={[0, 0.5, 0.95, 1]} 
-          style={StyleSheet.absoluteFillObject}
-        />
-        <TouchableOpacity 
-          style={styles.botaoVoltar} 
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-      </ImageBackground>
-      
-      <View style={styles.containerInferior}>
-         <Text style={styles.titulo}>{jogo.titulo}</Text>
-         
-         <Text style={styles.metadados}>
-           {jogo.ano_lancamento || '2025'} • {jogo.classificacao || '+18'} • {jogo.genero || 'Gênero não informado'}
-         </Text>
+    <View style={styles.container}>
+      <ScrollView bounces={false} style={{ flex: 1 }}>
+        
+        {/* CONTAINER DA IMAGEM (Fica no fundo de tudo) */}
+        <View style={styles.headerImageContainer}>
+          <Image 
+            source={{ uri: jogo.foto_fundo || jogo.foto_capa }} 
+            style={StyleSheet.absoluteFillObject}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.6)', '#000000']}
+            // Aos 85% da imagem, ela já vira preto absoluto, matando a borda da foto!
+            locations={[0, 0.5, 0.85]} 
+            style={StyleSheet.absoluteFillObject}
+          />
+          
+          <TouchableOpacity 
+            style={styles.botaoVoltar} 
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+        
+        {/* CONTAINER DE CONTEÚDO (Fundo totalmente preto que continua pro resto da tela) */}
+        <View style={styles.containerInferior}>
+           <Text style={styles.titulo}>{jogo.titulo}</Text>
+           
+           <Text style={styles.metadados}>
+             {jogo.ano_lancamento || '2025'} • {jogo.classificacao || '+18'} • {jogo.genero || 'Gênero não informado'}
+           </Text>
 
-         <View style={styles.containerAvaliacao}>
-            <Text style={styles.notaTexto}>{jogo.media_nota ? jogo.media_nota.replace('.', ',') : '0,0'}</Text>
-            <View style={styles.estrelas}>
-              {renderEstrelas(jogo.media_nota || 0)}
-            </View>
-         </View>
+           <View style={styles.containerAvaliacao}>
+              <Text style={styles.notaTexto}>{jogo.media_nota ? jogo.media_nota.replace('.', ',') : '0,0'}</Text>
+              <View style={styles.estrelas}>
+                {renderEstrelas(jogo.media_nota || 0)}
+              </View>
+           </View>
 
-         <View style={styles.botoesAcao}>
-            <TouchableOpacity style={styles.botaoAvaliar}>
-              <Text style={styles.textoBotaoAvaliar}>Avaliar</Text>
-            </TouchableOpacity>
+           <View style={styles.botoesAcao}>
+              <TouchableOpacity style={styles.botaoAvaliar}>
+                <Text style={styles.textoBotaoAvaliar}>Avaliar</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.botaoIcone}>
-              <Ionicons name="game-controller-outline" size={20} color="#FFF" />
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.botaoIcone}>
+                <Ionicons name="game-controller-outline" size={20} color="#FFF" />
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.botaoIcone}>
-              <Ionicons name="bookmark-outline" size={20} color="#FFF" />
-            </TouchableOpacity>
-         </View>
-         
-         {/* ÁREA DA SINOPSE ATUALIZADA */}
-         <Text style={styles.sinopseTitulo}>Sinopse</Text>
-         <Text 
-           style={styles.sinopseTexto}
-           // Se estiver expandido, mostra tudo (undefined), se não, corta em 3 linhas
-           numberOfLines={expandido ? undefined : 3}
-         >
-           {jogo.sinopse || "Sinopse não disponível."}
-         </Text>
+              <TouchableOpacity style={styles.botaoIcone}>
+                <Ionicons name="bookmark-outline" size={20} color="#FFF" />
+              </TouchableOpacity>
+           </View>
+           
+           <Text style={styles.sinopseTitulo}>Sinopse</Text>
+           <Text 
+             style={styles.sinopseTexto}
+             numberOfLines={expandido ? undefined : 3}
+           >
+             {jogo.sinopse || "Sinopse não disponível."}
+           </Text>
 
-         {/* Só mostra o botão "Ler mais" se existir uma sinopse grande o suficiente */}
-         {jogo.sinopse && jogo.sinopse.length > 120 && (
-           <TouchableOpacity onPress={() => setExpandido(!expandido)}>
-             <Text style={styles.lerMais}>
-               {expandido ? "Ler menos" : "Ler mais"}
-             </Text>
-           </TouchableOpacity>
-         )}
+           {jogo.sinopse && jogo.sinopse.length > 120 && (
+             <TouchableOpacity onPress={() => setExpandido(!expandido)}>
+               <Text style={styles.lerMais}>
+                 {expandido ? "Ler menos" : "Ler mais"}
+               </Text>
+             </TouchableOpacity>
+           )}
 
-         <View style={{ height: 40 }} />
-      </View>
-    </ScrollView>
+           <View style={{ height: 60 }} />
+        </View>
+        
+      </ScrollView>
+    </View>
   );
 }
 
@@ -149,13 +150,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  imagemFundo: {
+  headerImageContainer: {
     width: '100%',
-    height: 480, 
-  },
-  gradiente: {
-    flex: 1,
-    justifyContent: 'flex-start', 
+    height: 520, // Altura total da área da foto
   },
   botaoVoltar: {
     marginTop: 50, 
@@ -166,8 +163,11 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   containerInferior: {
+    flex: 1,
     paddingHorizontal: 24,
-    backgroundColor: 'transparent',
+    // FUNDO PRETO SÓLIDO PARA O RESTO DA TELA!
+    backgroundColor: '#000000', 
+    // Sobe por cima da área preta do gradiente, fundindo os dois sem deixar borda
     marginTop: -80, 
   },
   titulo: {
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   lerMais: {
-    color: '#ffffff', // A sua cor roxa para indicar que é clicável
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: 'bold',
     marginTop: 6,

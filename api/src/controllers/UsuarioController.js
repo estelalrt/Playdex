@@ -119,10 +119,17 @@ class UsuarioController {
   // A FUNÇÃO DA FOFOCA COM OS NOMES CORRETOS
   async registrarAtividade(req, res) {
         try {
-            // Agora extraímos a data e a review que vêm do aplicativo
             const { username, id_jogo, status, duracao, data, nota, review } = req.body;
 
-            // Passamos na ordem exata que o DAO está esperando
+            // 1. Verifica no banco se essa combinação já existe
+            const atividadeExistente = await UsuarioDAO.verificarAtividadeDuplicada(username, id_jogo, status);
+            
+            // 2. Se existir, barra a requisição e devolve um erro 400 (Bad Request)
+            if (atividadeExistente) {
+                return res.status(400).json({ error: "Você já registrou esse jogo com esse mesmo status!" });
+            }
+
+            // 3. Se não existir, segue o baile e salva normal no banco
             await UsuarioDAO.postarAtividade(username, id_jogo, status, duracao, data, nota, review);
             
             res.status(201).json({ message: "Atividade registrada com sucesso!" });
