@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginBottom: 20,
     width: "100%",
+    outlineStyle: 'none',
   },
   passwordWrapper: {
     width: "100%",
@@ -206,6 +207,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: "#FFFFFF",
     fontSize: 16,
+    outlineStyle: 'none',
   },
   eyeButton: {
     position: "absolute",

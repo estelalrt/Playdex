@@ -291,6 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#FFFFFF",
     fontSize: 16,
+    outlineStyle: 'none',
   },
   searchIcon: {
     tintColor: "#6F6F6F",

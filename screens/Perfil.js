@@ -319,7 +319,7 @@ export default function Perfil() {
           {diario.length === 0 ? (
             <Text style={styles.textoVazio}>Você ainda não registrou nenhuma atividade.</Text>
           ) : (
-            diario.map((item, index) => (
+            diario.slice(0, 3).map((item, index) => (
               <View key={index} style={styles.cardAtividade}>
                 <Image source={{ uri: item.jogo_capa }} style={styles.capaDiario} />
                 

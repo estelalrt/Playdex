@@ -396,6 +396,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 24,
+    outlineStyle: 'none',
   },
   label: {
     fontSize: 16,
@@ -423,6 +424,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     height: 55,
+    outlineStyle: 'none',
   },
   inputTransparente: {
     flex: 1,

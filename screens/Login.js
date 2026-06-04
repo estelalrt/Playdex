@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: "#FFFFFF",
     marginBottom: 16,
+    outlineStyle: 'none',
   },
   passwordWrapper: {
     width: 312,
