@@ -26,7 +26,6 @@ export default function Home() {
 
   const navigation = useNavigation();
 
-  // Efeito original (carrega Feed e Recomendações)
   useEffect(() => {
     const carregarDadosDoUsuario = async () => {
       try {
@@ -56,7 +55,6 @@ export default function Home() {
     carregarDadosDoUsuario();
   }, []);
 
-  // Efeito original (carrega Em Alta)
   useEffect(() => {
     async function buscarJogosPopulares() {
         try {
@@ -72,7 +70,6 @@ export default function Home() {
     buscarJogosPopulares();
   }, []);
 
-  // NOVO EFEITO: Ouve a barra de pesquisa
   useEffect(() => {
     if (search.trim() === "") {
       setResultadosBusca([]);
@@ -81,7 +78,6 @@ export default function Home() {
 
     setBuscando(true);
     
-    // Aguarda 500ms antes de bater no banco para não sobrecarregar
     const timer = setTimeout(async () => {
       try {
         const resposta = await fetch(`https://playdex-yh18.onrender.com/jogos/busca?q=${search}`);
@@ -130,7 +126,6 @@ export default function Home() {
         </View>
       </View>
 
-      {/* RENDERIZAÇÃO CONDICIONAL: Mostra a busca se tiver texto, senão mostra a Home normal */}
       {search.trim().length > 0 ? (
         <View style={styles.resultadosContainer}>
           <Text style={styles.sectionTitle}>Resultados para "{search}"</Text>
@@ -143,7 +138,7 @@ export default function Home() {
                 key={item.id} 
                 style={styles.cardBusca}
                 onPress={() => {
-                  setSearch(""); // Limpa a barra de pesquisa
+                  setSearch(""); 
                   navigation.navigate("DetalhesJogo", { id: item.id });
                 }}
               >
@@ -161,7 +156,6 @@ export default function Home() {
         </View>
       ) : (
         <>
-          {/* SEÇÃO NORMAL DA HOME */}
           <Text style={styles.sectionTitle}>Atividade de amigos</Text>
           
           {feed.length > 0 ? (
@@ -172,18 +166,24 @@ export default function Home() {
               contentContainerStyle={styles.scrollContainer}
             >
               {feed.map((item, index) => (
-                <TouchableOpacity 
-                  key={index} 
-                  style={styles.cardItem}
-                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}
-                >
-                  <Image
-                    source={{
-                      uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
-                    }}
-                    style={styles.game}
-                  />
-                  <View style={styles.activityInfo}>
+                // Aqui a grande mudança: A View principal segura o layout, e separamos os botões!
+                <View key={index} style={styles.cardItem}>
+                  
+                  {/* BOTÃO 1: Capa do Jogo (Leva pros detalhes do jogo) */}
+                  <TouchableOpacity onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}>
+                    <Image
+                      source={{
+                        uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
+                      }}
+                      style={styles.game}
+                    />
+                  </TouchableOpacity>
+
+                  {/* BOTÃO 2: Info do Amigo (Leva para o Perfil) */}
+                  <TouchableOpacity 
+                    style={styles.activityInfo}
+                    onPress={() => navigation.navigate("Perfil", { username: item.username })}
+                  >
                     <Image
                       source={{
                         uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
@@ -196,8 +196,8 @@ export default function Home() {
                       </Text>
                       {renderIconeStatus(item.status)}
                     </View>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
               ))}
             </ScrollView>
           ) : (
@@ -370,7 +370,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 20,
   },
-  // ESTILOS NOVOS DA BUSCA
   resultadosContainer: {
     marginTop: 10,
   },
