@@ -445,4 +445,16 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
   },
-  botaoSegu
+  botaoSeguindo: {
+    backgroundColor: '#1C1C1C',
+    borderWidth: 1,
+    borderColor: '#5012FF',
+  },
+  textoBotaoSeguir: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  textoBotaoSeguindo: {
+    color: '#5012FF',
+  },
+});
