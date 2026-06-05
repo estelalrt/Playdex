@@ -87,7 +87,6 @@ class UsuarioDAO {
         return resultado.rows;
     }
 
-    // Atualizado para salvar a data do app e o texto da review na tabela!
     async postarAtividade(username, id_jogo, status, duracao, data, nota, review) {
         const sql = `
           INSERT INTO atividade (id_usuario, id_jogo, status, duracao, data, nota, review) 
@@ -113,32 +112,26 @@ class UsuarioDAO {
           AND status = $3
         `;
         const resultado = await pool.query(sql, [username, id_jogo, status]);
-        // Se achou alguma coisa, retorna o registro. Se não achou, retorna undefined.
         return resultado.rows[0]; 
     }
 
     async pegarJogosEmAlta() {
-    try {
-      // Ajustamos 'jogos' para 'jogo' (singular)
-      const sql = `
-        SELECT j.id, j.titulo, j.foto_capa 
-        FROM jogos_em_alta ja
-        INNER JOIN jogo j ON ja.id_jogo = j.id
-        ORDER BY ja.posicao ASC
-      `;
-
-      // Trocamos 'conexao' por 'pool' e ajustamos o formato da variável
-      const resultado = await pool.query(sql); 
-
-      // Retornamos 'resultado.rows' no mesmo padrão que você já usa no arquivo
-      return resultado.rows;
-    } catch (erro) {
-      console.error("Erro no DAO ao buscar jogos em alta:", erro);
-      throw erro; 
+        try {
+          const sql = `
+            SELECT j.id, j.titulo, j.foto_capa 
+            FROM jogos_em_alta ja
+            INNER JOIN jogo j ON ja.id_jogo = j.id
+            ORDER BY ja.posicao ASC
+          `;
+          const resultado = await pool.query(sql); 
+          return resultado.rows;
+        } catch (erro) {
+          console.error("Erro no DAO ao buscar jogos em alta:", erro);
+          throw erro; 
+        }
     }
-  }
 
-  async pegarAtividadesDoUsuario(username) {
+    async pegarAtividadesDoUsuario(username) {
         const sql = `
           SELECT 
             a.id,
@@ -192,32 +185,28 @@ class UsuarioDAO {
         return resultado.rows[0];
     }
 
+    // --- CORRIGIDO: Removidas as vírgulas intrusas entre os métodos da classe ---
     async seguirUsuario(seguidorUsername, seguidoUsername) {
-        // Busca os IDs baseados nos usernames e insere na sua tabela
         const sql = `
             INSERT INTO seguidores (id_seguidor, id_seguido) 
             VALUES (
                 (SELECT id FROM usuario WHERE username = $1),
                 (SELECT id FROM usuario WHERE username = $2)
             )
-            -- Se você não tiver colocado uma trava de duplicidade no banco, 
-            -- o Node vai tentar inserir. O ideal é ter a Primary Key dupla na tabela!
         `;
         await pool.query(sql, [seguidorUsername, seguidoUsername]);
-    },
+    }
 
     async deixarDeSeguir(seguidorUsername, seguidoUsername) {
-        // Deleta usando os IDs encontrados
         const sql = `
             DELETE FROM seguidores 
             WHERE id_seguidor = (SELECT id FROM usuario WHERE username = $1) 
               AND id_seguido = (SELECT id FROM usuario WHERE username = $2)
         `;
         await pool.query(sql, [seguidorUsername, seguidoUsername]);
-    },
+    }
 
-    async obterContagemSeguidores(username) {
-        // Conta os seguidores e seguindo de uma vez só usando o ID do usuário
+    async obtenerContagemSeguidores(username) {
         const sql = `
             SELECT 
                 (SELECT COUNT(*) FROM seguidores WHERE id_seguido = u.id) as seguidores,
@@ -229,11 +218,11 @@ class UsuarioDAO {
         
         if (resultado.rows.length > 0) {
             return {
-                seguidores: parseInt(resultado.rows[0].seguidores),
-                seguindo: parseInt(resultado.rows[0].seguindo)
+                followers: parseInt(resultado.rows[0].seguidores),
+                following: parseInt(resultado.rows[0].seguindo)
             };
         }
-        return { seguidores: 0, seguindo: 0 };
+        return { followers: 0, following: 0 };
     }
 }
 

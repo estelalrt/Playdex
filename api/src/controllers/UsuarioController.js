@@ -80,9 +80,7 @@ class UsuarioController {
 
   async buscarDetalhesJogo(req, res) {
     try {
-      // Pega o ID que virá na URL (ex: /jogos/1)
       const { id } = req.params; 
-      
       const jogo = await UsuarioDAO.buscarJogoPorId(id);
       
       if (jogo) {
@@ -116,22 +114,16 @@ class UsuarioController {
     }
   }
 
-  // A FUNÇÃO DA FOFOCA COM OS NOMES CORRETOS
   async registrarAtividade(req, res) {
         try {
             const { username, id_jogo, status, duracao, data, nota, review } = req.body;
-
-            // 1. Verifica no banco se essa combinação já existe
             const atividadeExistente = await UsuarioDAO.verificarAtividadeDuplicada(username, id_jogo, status);
             
-            // 2. Se existir, barra a requisição e devolve um erro 400 (Bad Request)
             if (atividadeExistente) {
                 return res.status(400).json({ error: "Você já registrou esse jogo com esse mesmo status!" });
             }
 
-            // 3. Se não existir, segue o baile e salva normal no banco
             await UsuarioDAO.postarAtividade(username, id_jogo, status, duracao, data, nota, review);
-            
             res.status(201).json({ message: "Atividade registrada com sucesso!" });
         } catch (erro) {
             console.error("Erro ao registrar atividade:", erro);
@@ -142,7 +134,6 @@ class UsuarioController {
   async buscarJogosPopulares(req, res) {
     try {
       const jogosPopulares = await UsuarioDAO.pegarJogosEmAlta(); 
-      
       res.status(200).json(jogosPopulares);
     } catch (erro) {
       console.error("Erro ao buscar jogos populares no banco:", erro);
@@ -170,7 +161,44 @@ class UsuarioController {
             console.error("Erro ao buscar recomendações:", erro);
             res.status(500).json({ erro: "Falha ao buscar recomendações" });
         }
-    }
+  }
+
+  // --- NOVAS FUNÇÕES DE REDE SOCIAL AQUI! ---
+  async seguir(req, res) {
+      try {
+          const { seguidor, seguido } = req.body;
+          if (seguidor === seguido) {
+              return res.status(400).json({ erro: "Você não pode seguir a si mesmo." });
+          }
+          await UsuarioDAO.seguirUsuario(seguidor, seguido);
+          res.status(200).json({ mensagem: "Seguindo com sucesso!" });
+      } catch (erro) {
+          console.error("Erro ao seguir:", erro);
+          res.status(500).json({ erro: "Erro interno no servidor" });
+      }
+  }
+
+  async unfollow(req, res) {
+      try {
+          const { seguidor, seguido } = req.body;
+          await UsuarioDAO.deixarDeSeguir(seguidor, seguido);
+          res.status(200).json({ mensagem: "Deixou de seguir." });
+      } catch (erro) {
+          console.error("Erro ao deixar de seguir:", erro);
+          res.status(500).json({ erro: "Erro interno no servidor" });
+      }
+  }
+
+  async contagemRede(req, res) {
+      try {
+          const { username } = req.params;
+          const contagem = await UsuarioDAO.obterContagemSeguidores(username);
+          res.status(200).json(contagem);
+      } catch (erro) {
+          console.error("Erro ao buscar contagem:", erro);
+          res.status(500).json({ erro: "Erro interno no servidor" });
+      }
+  }
 }
 
 module.exports = new UsuarioController();
