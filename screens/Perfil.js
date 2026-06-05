@@ -14,10 +14,10 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native"; // <-- Importante para receber parâmetros
+import { useRoute } from "@react-navigation/native"; 
 
 export default function Perfil() {
-  const route = useRoute(); // <-- Pega parâmetros passados pela Home
+  const route = useRoute(); 
 
   // Estados do Perfil
   const [meuUsername, setMeuUsername] = useState("");
@@ -29,10 +29,9 @@ export default function Perfil() {
   // NOVOS ESTADOS PARA REDE SOCIAL
   const [seguidores, setSeguidores] = useState(0);
   const [seguindo, setSeguindo] = useState(0);
-  const [estouSeguindo, setEstouSeguindo] = useState(false); // Para o botão mudar de cor
+  const [estouSeguindo, setEstouSeguindo] = useState(false); 
 
   // O username de quem estamos vendo (pode ser você ou um amigo)
-  // Se route.params.username existir, usamos ele, senão, usamos o vazio (que será preenchido com o seu)
   const perfilVisitado = route.params?.username || meuUsername;
 
   // Estados dos Favoritos (Prateleira)
@@ -105,7 +104,7 @@ export default function Perfil() {
       };
 
       carregarTudo();
-    }, [route.params?.username]) // Recarrega se o username mudar
+    }, [route.params?.username]) 
   );
 
   // NOVA FUNÇÃO: SEGUIR USUÁRIO
@@ -131,7 +130,6 @@ export default function Perfil() {
     }
   };
 
-  // ... (O resto das suas funções de pesquisa e edição de bio continuam iguais) ...
   const abrirPesquisa = (index) => {
     // Só deixa pesquisar se for o seu próprio perfil
     if (perfilVisitado === meuUsername) {
@@ -280,7 +278,6 @@ export default function Perfil() {
             <View style={styles.headerTextos}>
               <Text style={styles.userName}>{perfilVisitado || "Visitante"}</Text>
               
-              {/* NOVA ÁREA: NÚMEROS DE SEGUIDORES */}
               <View style={styles.redeContainer}>
                 <Text style={styles.redeTexto}><Text style={styles.redeNumero}>{seguidores}</Text> Seguidores</Text>
                 <Text style={styles.redeTexto}><Text style={styles.redeNumero}>{seguindo}</Text> Seguindo</Text>
@@ -288,8 +285,6 @@ export default function Perfil() {
             </View>
           </View>
 
-          {/* BOTÃO DINÂMICO: Se for meu perfil, mostra engrenagem (configurações). 
-              Se for de amigo, mostra botão SEGUIR */}
           {perfilVisitado !== meuUsername ? (
             <TouchableOpacity 
               style={[styles.botaoSeguir, estouSeguindo && styles.botaoSeguindo]} 
@@ -300,7 +295,6 @@ export default function Perfil() {
               </Text>
             </TouchableOpacity>
           ) : (
-             // Ícone placeholder para futuras configurações (Editar senha, etc)
              <Ionicons name="settings-outline" size={24} color="#6F6F6F" />
           )}
 
@@ -335,8 +329,6 @@ export default function Perfil() {
             <Text style={styles.bioText}>{bio || "Nenhuma bio definida."}</Text>
           )}
         </View>
-
-        {/* ... (Todo o resto da UI dos favoritos, diário e links continua exatamente igual!) ... */}
         
         <View style={styles.secaoFavoritos}>
           <Text style={styles.subtitulo}>Jogos Favoritos</Text>
@@ -410,14 +402,60 @@ export default function Perfil() {
         <View style={{ height: 40 }} /> 
       </ScrollView>
 
-      {/* Modal de pesquisa ... (continua igual) */}
+      <Modal visible={modalVisivel} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitulo}>Escolha um jogo</Text>
+            <TouchableOpacity onPress={fecharPesquisa}>
+              <Ionicons name="close" size={28} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            style={styles.inputPesquisa}
+            placeholder="Pesquise um jogo..."
+            placeholderTextColor="#6F6F6F"
+            value={query}
+            onChangeText={buscarJogos}
+            autoFocus
+          />
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {sugestoes.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.itemSugestao}
+                onPress={() => handleSelecionarJogo(item)}
+              >
+                <Image
+                  source={{ uri: item.foto_capa }}
+                  style={styles.capinhaSugestao}
+                />
+                <Text style={styles.textoSugestao}>{item.titulo}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // ... (Cole aqui os seus estilos antigos do Perfil.js)
-  // Adicionei esses novos para a Rede Social:
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#000000",
+  },
+  container: {
+    flex: 1,
+    paddingTop: 20,
+    paddingHorizontal: 24,
+  },
+  header: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", // Alterado para os itens ficarem separados
+    marginTop: 20,
+  },
   headerEsquerda: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -425,6 +463,17 @@ const styles = StyleSheet.create({
   },
   headerTextos: {
     marginLeft: 15,
+  },
+  userName: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  profilepic: {
+    width: 60, // Aumentei um tiquinho para dar destaque
+    height: 60,
+    borderRadius: 30,
+    resizeMode: "cover",
   },
   redeContainer: {
     flexDirection: 'row',
@@ -456,5 +505,192 @@ const styles = StyleSheet.create({
   },
   textoBotaoSeguindo: {
     color: '#5012FF',
+  },
+  sectionTitle: {
+    color: "#FFFFFF",
+    marginTop: 32,
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  bioHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+  },
+  bioContainer: {
+    backgroundColor: "#1C1C1C",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+  },
+  bioText: {
+    color: "#B3B3B3",
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  editButtonText: {
+    color: "#6F6F6F",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  saveButtonText: {
+    color: "#5012FF",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  secaoFavoritos: {
+    marginTop: 40,
+  },
+  subtitulo: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 16,
+  },
+  linhaFavoritos: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  slotFavorito: {
+    width: 75,
+    height: 110,
+    backgroundColor: "#1C1C1C",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#2A2A2A",
+  },
+  capapaFavorito: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  secaoDiario: {
+    marginTop: 40,
+  },
+  textoVazio: {
+    color: "#6F6F6F",
+    fontSize: 14,
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 10,
+  },
+  cardAtividade: {
+    flexDirection: "row",
+    backgroundColor: "#1C1C1C",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#2A2A2A",
+  },
+  capaDiario: {
+    width: 60,
+    height: 90,
+    borderRadius: 6,
+    marginRight: 16,
+  },
+  infoDiario: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  tituloJogoDiario: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  linhaStatusData: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  textoStatus: {
+    color: "#00BEBE", 
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  textoData: {
+    color: "#6F6F6F",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  textoNota: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  textoReview: {
+    color: "#B3B3B3",
+    fontSize: 13,
+    fontStyle: "italic",
+    lineHeight: 18,
+    marginTop: 4,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
+    paddingTop: 60,
+    paddingHorizontal: 24,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitulo: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  inputPesquisa: {
+    backgroundColor: "#1C1C1C",
+    borderRadius: 15,
+    height: 50,
+    paddingHorizontal: 16,
+    color: "#FFFFFF",
+    fontSize: 16,
+    marginBottom: 20,
+    outlineStyle: "none",
+    borderWidth: 0,
+  },
+  itemSugestao: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1C1C1C",
+  },
+  capinhaSugestao: {
+    width: 40,
+    height: 55,
+    borderRadius: 5,
+    marginRight: 12,
+  },
+  textoSugestao: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    flex: 1,
+  },
+  secaoLinks: {
+    marginTop: 32,
+    borderTopWidth: 1,
+    borderTopColor: "#1C1C1C",
+  },
+  linkRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1C1C1C",
+  },
+  linkText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
