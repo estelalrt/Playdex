@@ -191,6 +191,50 @@ class UsuarioDAO {
         const resultado = await pool.query(sql, [id]);
         return resultado.rows[0];
     }
+
+    async seguirUsuario(seguidorUsername, seguidoUsername) {
+        // Busca os IDs baseados nos usernames e insere na sua tabela
+        const sql = `
+            INSERT INTO seguidores (id_seguidor, id_seguido) 
+            VALUES (
+                (SELECT id FROM usuario WHERE username = $1),
+                (SELECT id FROM usuario WHERE username = $2)
+            )
+            -- Se você não tiver colocado uma trava de duplicidade no banco, 
+            -- o Node vai tentar inserir. O ideal é ter a Primary Key dupla na tabela!
+        `;
+        await pool.query(sql, [seguidorUsername, seguidoUsername]);
+    },
+
+    async deixarDeSeguir(seguidorUsername, seguidoUsername) {
+        // Deleta usando os IDs encontrados
+        const sql = `
+            DELETE FROM seguidores 
+            WHERE id_seguidor = (SELECT id FROM usuario WHERE username = $1) 
+              AND id_seguido = (SELECT id FROM usuario WHERE username = $2)
+        `;
+        await pool.query(sql, [seguidorUsername, seguidoUsername]);
+    },
+
+    async obterContagemSeguidores(username) {
+        // Conta os seguidores e seguindo de uma vez só usando o ID do usuário
+        const sql = `
+            SELECT 
+                (SELECT COUNT(*) FROM seguidores WHERE id_seguido = u.id) as seguidores,
+                (SELECT COUNT(*) FROM seguidores WHERE id_seguidor = u.id) as seguindo
+            FROM usuario u
+            WHERE u.username = $1
+        `;
+        const resultado = await pool.query(sql, [username]);
+        
+        if (resultado.rows.length > 0) {
+            return {
+                seguidores: parseInt(resultado.rows[0].seguidores),
+                seguindo: parseInt(resultado.rows[0].seguindo)
+            };
+        }
+        return { seguidores: 0, seguindo: 0 };
+    }
 }
 
 module.exports = new UsuarioDAO();

@@ -338,7 +338,7 @@ export default function Perfil() {
                   
                   {/* Avaliação */}
                   {item.nota > 0 && (
-                    <Text style={styles.textoNota}>Avaliação: {item.nota} / 5</Text>
+                    <Text>Avaliação: {Number(item.nota).toString().replace('.', ',')} / 5</Text>
                   )}
                   
                   {/* Review */}
