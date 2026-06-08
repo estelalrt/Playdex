@@ -199,6 +199,17 @@ class UsuarioController {
           res.status(500).json({ erro: "Erro interno no servidor" });
       }
   }
+
+  async checarSeguir(req, res) {
+      try {
+          const { seguidor, seguido } = req.params;
+          const segue = await UsuarioDAO.verificaSeSegue(seguidor, seguido);
+          res.status(200).json({ segue });
+      } catch (erro) {
+          console.error("Erro ao verificar status:", erro);
+          res.status(500).json({ erro: "Erro interno no servidor" });
+      }
+  }
 }
 
 module.exports = new UsuarioController();

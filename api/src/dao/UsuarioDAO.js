@@ -224,6 +224,17 @@ class UsuarioDAO {
         }
         return { followers: 0, following: 0 };
     }
+
+    async verificaSeSegue(seguidorUsername, seguidoUsername) {
+        const sql = `
+            SELECT 1 FROM seguidores 
+            WHERE id_seguidor = (SELECT id FROM usuario WHERE username = $1) 
+              AND id_seguido = (SELECT id FROM usuario WHERE username = $2)
+        `;
+        const resultado = await pool.query(sql, [seguidorUsername, seguidoUsername]);
+        // Se a lista for maior que zero, retorna TRUE (já segue). Senão, FALSE.
+        return resultado.rows.length > 0;
+    }
 }
 
 module.exports = new UsuarioDAO();
