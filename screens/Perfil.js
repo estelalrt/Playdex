@@ -91,12 +91,12 @@ export default function Perfil() {
             setDiario(await resDiario.json());
           }
 
-          // 4. Busca a contagem de Seguidores do ALVO
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
           if (resRede.ok) {
             const dadosRede = await resRede.json();
-            setSeguidores(dadosRede.seguidores);
-            setSeguindo(dadosRede.seguindo);
+            // Agora ele lê os nomes em inglês que o banco de dados está mandando!
+            setSeguidores(dadosRede.followers || 0);
+            setSeguindo(dadosRede.following || 0);
           }
 
         } catch (erro) {
