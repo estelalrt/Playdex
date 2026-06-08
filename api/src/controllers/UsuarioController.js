@@ -210,6 +210,22 @@ class UsuarioController {
           res.status(500).json({ erro: "Erro interno no servidor" });
       }
   }
+
+  // Adicione isso dentro da classe UsuarioController
+  async buscarUsuarios(req, res) {
+      try {
+          const queryPesquisa = req.query.q; 
+          if (!queryPesquisa) {
+              return res.json([]); // Retorna array vazio se não digitar nada
+          }
+          
+          const usuarios = await UsuarioDAO.buscarUsuariosPorNome(queryPesquisa);
+          return res.status(200).json(usuarios);
+      } catch (erro) {
+          console.error("Erro ao buscar usuários:", erro);
+          return res.status(500).json({ mensagem: "Erro ao pesquisar usuários" });
+      }
+  }
 }
 
 module.exports = new UsuarioController();

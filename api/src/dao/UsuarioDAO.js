@@ -235,6 +235,18 @@ class UsuarioDAO {
         // Se a lista for maior que zero, retorna TRUE (já segue). Senão, FALSE.
         return resultado.rows.length > 0;
     }
+
+    // Adicione isso dentro da classe UsuarioDAO
+    async buscarUsuariosPorNome(pesquisa) {
+        const sql = `
+            SELECT username, nome, foto_perfil 
+            FROM usuario 
+            WHERE username ILIKE $1 OR nome ILIKE $1 
+            LIMIT 10
+        `;
+        const resultado = await pool.query(sql, [`%${pesquisa}%`]);
+        return resultado.rows;
+    }
 }
 
 module.exports = new UsuarioDAO();

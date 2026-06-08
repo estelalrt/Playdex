@@ -20,8 +20,9 @@ export default function Home() {
   const [carregandoJogos, setCarregandoJogos] = useState(true);
   const [recomendados, setRecomendados] = useState([]);
   
-  // NOVOS ESTADOS PARA A BUSCA
-  const [resultadosBusca, setResultadosBusca] = useState([]);
+  // ESTADOS PARA A BUSCA
+  const [resultadosBusca, setResultadosBusca] = useState([]); // Jogos
+  const [resultadosUsuarios, setResultadosUsuarios] = useState([]); // Usuários
   const [buscando, setBuscando] = useState(false);
 
   const navigation = useNavigation();
@@ -70,9 +71,11 @@ export default function Home() {
     buscarJogosPopulares();
   }, []);
 
+  // EFEITO DE BUSCA ATUALIZADO PARA BUSCAR JOGOS E USUÁRIOS
   useEffect(() => {
     if (search.trim() === "") {
       setResultadosBusca([]);
+      setResultadosUsuarios([]);
       return;
     }
 
@@ -80,11 +83,18 @@ export default function Home() {
     
     const timer = setTimeout(async () => {
       try {
-        const resposta = await fetch(`https://playdex-yh18.onrender.com/jogos/busca?q=${search}`);
-        const dados = await resposta.json();
-        setResultadosBusca(dados);
+        const [resJogos, resUsuarios] = await Promise.all([
+          fetch(`https://playdex-yh18.onrender.com/jogos/busca?q=${search}`),
+          fetch(`https://playdex-yh18.onrender.com/usuarios/busca?q=${search}`)
+        ]);
+        
+        const dadosJogos = await resJogos.json();
+        const dadosUsuarios = await resUsuarios.json();
+
+        setResultadosBusca(dadosJogos);
+        setResultadosUsuarios(dadosUsuarios);
       } catch (erro) {
-        console.error("Erro na busca de jogos:", erro);
+        console.error("Erro na busca mista:", erro);
       } finally {
         setBuscando(false);
       }
@@ -132,26 +142,68 @@ export default function Home() {
           
           {buscando ? (
             <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
-          ) : resultadosBusca.length > 0 ? (
-            resultadosBusca.map((item) => (
-              <TouchableOpacity 
-                key={item.id} 
-                style={styles.cardBusca}
-                onPress={() => {
-                  setSearch(""); 
-                  navigation.navigate("DetalhesJogo", { id: item.id });
-                }}
-              >
-                <Image 
-                  source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
-                  style={styles.capaBusca} 
-                />
-                <Text style={styles.tituloBusca}>{item.titulo}</Text>
-                <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
-              </TouchableOpacity>
-            ))
           ) : (
-            <Text style={styles.textoVazio}>Nenhum jogo encontrado com esse nome.</Text>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 10 }}>
+              
+              {/* RENDERIZAÇÃO DOS USUÁRIOS */}
+              {resultadosUsuarios.length > 0 && (
+                <>
+                  <Text style={styles.subTituloBusca}>Perfis</Text>
+                  {resultadosUsuarios.map((user, idx) => (
+                    <TouchableOpacity 
+                      key={`user-${idx}`} 
+                      style={styles.cardBusca}
+                      onPress={() => {
+                        setSearch(""); 
+                        // Usando push para empilhar a navegação do perfil
+                        navigation.push("PerfilAmigo", { username: user.username });
+                      }}
+                    >
+                      <Image 
+                        source={{ uri: user.foto_perfil || "https://github.com/github.png" }} 
+                        style={styles.fotoPerfilBusca} 
+                      />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.tituloBusca}>{user.nome}</Text>
+                        <Text style={styles.textoArroba}>@{user.username}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
+
+              {/* RENDERIZAÇÃO DOS JOGOS */}
+              {resultadosBusca.length > 0 && (
+                <>
+                  <Text style={[styles.subTituloBusca, { marginTop: resultadosUsuarios.length > 0 ? 20 : 0 }]}>Jogos</Text>
+                  {resultadosBusca.map((item) => (
+                    <TouchableOpacity 
+                      key={`game-${item.id}`} 
+                      style={styles.cardBusca}
+                      onPress={() => {
+                        setSearch(""); 
+                        navigation.navigate("DetalhesJogo", { id: item.id });
+                      }}
+                    >
+                      <Image 
+                        source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
+                        style={styles.capaBusca} 
+                      />
+                      <Text style={styles.tituloBusca}>{item.titulo}</Text>
+                      <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
+
+              {/* MENSAGEM SE NÃO ENCONTRAR NADA */}
+              {resultadosUsuarios.length === 0 && resultadosBusca.length === 0 && (
+                <Text style={styles.textoVazio}>Nenhum jogo ou usuário encontrado com esse nome.</Text>
+              )}
+              
+              <View style={{ height: 40 }} />
+            </ScrollView>
           )}
         </View>
       ) : (
@@ -166,10 +218,8 @@ export default function Home() {
               contentContainerStyle={styles.scrollContainer}
             >
               {feed.map((item, index) => (
-                // Aqui a grande mudança: A View principal segura o layout, e separamos os botões!
                 <View key={index} style={styles.cardItem}>
                   
-                  {/* BOTÃO 1: Capa do Jogo (Leva pros detalhes do jogo) */}
                   <TouchableOpacity onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}>
                     <Image
                       source={{
@@ -179,10 +229,9 @@ export default function Home() {
                     />
                   </TouchableOpacity>
 
-                  {/* BOTÃO 2: Info do Amigo (Leva para o Perfil) */}
                   <TouchableOpacity 
                     style={styles.activityInfo}
-                    onPress={() => navigation.navigate("PerfilAmigo", { username: item.username })}
+                    onPress={() => navigation.push("PerfilAmigo", { username: item.username })}
                   >
                     <Image
                       source={{
@@ -371,7 +420,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resultadosContainer: {
+    flex: 1,
     marginTop: 10,
+  },
+  subTituloBusca: {
+    color: "#6F6F6F",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 8,
+    textTransform: "uppercase",
   },
   cardBusca: {
     flexDirection: 'row',
@@ -379,7 +436,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1C',
     padding: 12,
     borderRadius: 12,
-    marginTop: 12,
+    marginBottom: 12,
   },
   capaBusca: {
     width: 50,
@@ -387,10 +444,21 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: 15,
   },
+  fotoPerfilBusca: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
   tituloBusca: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
     flex: 1,
+  },
+  textoArroba: {
+    color: "#6F6F6F",
+    fontSize: 14,
+    marginTop: 2,
   },
 });

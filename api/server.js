@@ -26,9 +26,9 @@ app.get('/recomendacoes/:username', UsuarioController.buscarRecomendacoes);
 app.post('/seguir', UsuarioController.seguir);
 app.post('/unfollow', UsuarioController.unfollow);
 app.get('/usuario/:username/rede', UsuarioController.contagemRede);
-app.get('/verificar-seguir/:seguidor/:seguido', UsuarioController.checarSeguir); // <- Essa é a rota nova para checar se já segue
+app.get('/verificar-seguir/:seguidor/:seguido', UsuarioController.checarSeguir);
+app.get('/usuarios/busca', UsuarioController.buscarUsuarios);
 
-// Olha como fica mais limpo chamando o Controller:
 app.get('/jogo/:id', UsuarioController.buscarDetalhesJogo); 
 
 app.listen(3000, () => {
