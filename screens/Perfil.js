@@ -92,11 +92,12 @@ export default function Perfil() {
           }
 
           // 4. Busca a contagem de Seguidores do ALVO
+          // 4. Busca a contagem de Seguidores do ALVO
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
           if (resRede.ok) {
             const dadosRede = await resRede.json();
-            setSeguidores(dadosRede.seguidores || 0);
-            setSeguindo(dadosRede.seguindo || 0);
+            setSeguidores(dadosRede.followers || 0); // Mudou para followers
+            setSeguindo(dadosRede.following || 0);   // Mudou para following
           }
 
           if (alvoBusca !== usuarioSalvo) {
