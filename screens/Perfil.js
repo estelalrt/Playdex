@@ -95,9 +95,8 @@ export default function Perfil() {
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
           if (resRede.ok) {
             const dadosRede = await resRede.json();
-            // Agora ele lê os nomes em inglês que o banco de dados está mandando!
-            setSeguidores(dadosRede.followers || 0);
-            setSeguindo(dadosRede.following || 0);
+            setSeguidores(dadosRede.seguidores || 0);
+            setSeguindo(dadosRede.seguindo || 0);
           }
 
           if (alvoBusca !== usuarioSalvo) {
@@ -133,7 +132,8 @@ export default function Perfil() {
 
       if (resposta.ok) {
         setEstouSeguindo(!estouSeguindo);
-        setSeguidores(prev => estouSeguindo ? prev - 1 : prev + 1);
+        // O Math.max obriga o número a ser no mínimo 0, evitando o -1!
+        setSeguidores(prev => Math.max(0, estouSeguindo ? prev - 1 : prev + 1));
       }
     } catch (erro) {
       console.log("Erro ao seguir:", erro);

@@ -206,7 +206,7 @@ class UsuarioDAO {
         await pool.query(sql, [seguidorUsername, seguidoUsername]);
     }
 
-    async obtenerContagemSeguidores(username) {
+    async obterContagemSeguidores(username) {
         const sql = `
             SELECT 
                 (SELECT COUNT(*) FROM seguidores WHERE id_seguido = u.id) as seguidores,
