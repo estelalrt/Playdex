@@ -8,8 +8,7 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  TouchableOpacity,
-  RefreshControl
+  TouchableOpacity
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -23,7 +22,6 @@ export default function Home() {
   const [resultadosBusca, setResultadosBusca] = useState([]); // Jogos
   const [resultadosUsuarios, setResultadosUsuarios] = useState([]); // Usuários
   const [buscando, setBuscando] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
   // FUNÇÃO ÚNICA PARA CARREGAR TODOS OS DADOS DA HOME
@@ -65,13 +63,6 @@ export default function Home() {
       carregarHome();
     }, [])
   );
-
-  // FUNÇÃO DO "PUXAR PARA ATUALIZAR"
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await carregarHome();
-    setRefreshing(false);
-  };
 
   // EFEITO DE BUSCA PARA JOGOS E USUÁRIOS
   useEffect(() => {
@@ -121,14 +112,6 @@ export default function Home() {
       <ScrollView 
         style={styles.container}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            tintColor="#5012FF" 
-            colors={["#5012FF"]} 
-          />
-        }
       >
         <View style={styles.header}>
           <Image
