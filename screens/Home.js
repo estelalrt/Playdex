@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
@@ -8,10 +8,11 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  RefreshControl
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -19,59 +20,60 @@ export default function Home() {
   const [jogosPopulares, setJogosPopulares] = useState([]);
   const [carregandoJogos, setCarregandoJogos] = useState(true);
   const [recomendados, setRecomendados] = useState([]);
-  
-  // ESTADOS PARA A BUSCA
   const [resultadosBusca, setResultadosBusca] = useState([]); // Jogos
   const [resultadosUsuarios, setResultadosUsuarios] = useState([]); // Usuários
   const [buscando, setBuscando] = useState(false);
-
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const carregarDadosDoUsuario = async () => {
-      try {
-        const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
-        if (!usuarioSalvo) return;
+  // FUNÇÃO ÚNICA PARA CARREGAR TODOS OS DADOS DA HOME
+  const carregarHome = async () => {
+    try {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+      if (!usuarioSalvo) return;
 
-        const urlFeed = `https://playdex-yh18.onrender.com/feed/${usuarioSalvo}`;
-        const urlRecs = `https://playdex-yh18.onrender.com/recomendacoes/${usuarioSalvo}`;
+      const urlFeed = `https://playdex-yh18.onrender.com/feed/${usuarioSalvo}`;
+      const urlRecs = `https://playdex-yh18.onrender.com/recomendacoes/${usuarioSalvo}`;
+      const urlPopulares = `https://playdex-yh18.onrender.com/jogos/populares`;
 
-        const [resFeed, resRecs] = await Promise.all([
-          fetch(urlFeed, {
-            headers: { Accept: "application/json", "User-Agent": "PostmanRuntime/7.32.3" }
-          }),
-          fetch(urlRecs, {
-            headers: { Accept: "application/json", "User-Agent": "PostmanRuntime/7.32.3" }
-          })
-        ]);
+      const [resFeed, resRecs, resPopulares] = await Promise.all([
+        fetch(urlFeed, {
+          headers: { Accept: "application/json", "User-Agent": "PostmanRuntime/7.32.3" }
+        }),
+        fetch(urlRecs, {
+          headers: { Accept: "application/json", "User-Agent": "PostmanRuntime/7.32.3" }
+        }),
+        fetch(urlPopulares, {
+          headers: { Accept: "application/json" }
+        })
+      ]);
 
-        if (resFeed.ok) setFeed(await resFeed.json());
-        if (resRecs.ok) setRecomendados(await resRecs.json());
+      if (resFeed.ok) setFeed(await resFeed.json());
+      if (resRecs.ok) setRecomendados(await resRecs.json());
+      if (resPopulares.ok) setJogosPopulares(await resPopulares.json());
 
-      } catch (erro) {
-        console.log("Erro de conexão nos dados do usuário:", erro);
-      }
-    };
-    
-    carregarDadosDoUsuario();
-  }, []);
-
-  useEffect(() => {
-    async function buscarJogosPopulares() {
-        try {
-            const resposta = await fetch('https://playdex-yh18.onrender.com/jogos/populares');
-            const dados = await resposta.json();
-            setJogosPopulares(dados);
-        } catch (erro) {
-            console.error("Erro ao carregar jogos populares:", erro);
-        } finally {
-            setCarregandoJogos(false);
-        }
+    } catch (erro) {
+      console.log("Erro de conexão na Home:", erro);
+    } finally {
+      setCarregandoJogos(false);
     }
-    buscarJogosPopulares();
-  }, []);
+  };
 
-  // EFEITO DE BUSCA ATUALIZADO PARA BUSCAR JOGOS E USUÁRIOS
+  // ATUALIZA A TELA SEMPRE QUE VOCÊ NAVEGA PARA ELA
+  useFocusEffect(
+    useCallback(() => {
+      carregarHome();
+    }, [])
+  );
+
+  // FUNÇÃO DO "PUXAR PARA ATUALIZAR"
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await carregarHome();
+    setRefreshing(false);
+  };
+
+  // EFEITO DE BUSCA PARA JOGOS E USUÁRIOS
   useEffect(() => {
     if (search.trim() === "") {
       setResultadosBusca([]);
@@ -115,7 +117,17 @@ export default function Home() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl 
+          refreshing={refreshing} 
+          onRefresh={onRefresh} 
+          tintColor="#5012FF" 
+          colors={["#5012FF"]} 
+        />
+      }
+    >
       <View style={styles.header}>
         <Image
           source={require("../assets/logos/Logo.png")}
@@ -155,7 +167,6 @@ export default function Home() {
                       style={styles.cardBusca}
                       onPress={() => {
                         setSearch(""); 
-                        // Usando push para empilhar a navegação do perfil
                         navigation.push("PerfilAmigo", { username: user.username });
                       }}
                     >
