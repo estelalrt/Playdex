@@ -182,7 +182,7 @@ export default function Home() {
                   {/* BOTÃO 2: Info do Amigo (Leva para o Perfil) */}
                   <TouchableOpacity 
                     style={styles.activityInfo}
-                    onPress={() => navigation.navigate("Perfil", { username: item.username })}
+                    onPress={() => navigation.navigate("PerfilAmigo", { username: item.username })}
                   >
                     <Image
                       source={{

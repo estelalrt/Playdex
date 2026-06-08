@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
@@ -25,6 +26,7 @@ export default function Perfil() {
   const [fotoUri, setFotoUri] = useState("https://github.com/github.png");
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState("");
+  const navigation = useNavigation();
 
   // NOVOS ESTADOS PARA REDE SOCIAL
   const [seguidores, setSeguidores] = useState(0);
@@ -271,6 +273,12 @@ export default function Perfil() {
         <View style={styles.header}>
           
           <View style={styles.headerEsquerda}>
+            {perfilVisitado !== meuUsername && (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 15 }}>
+                <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity onPress={escolherFoto}>
               <Image source={{ uri: fotoUri }} style={styles.profilepic} />
             </TouchableOpacity>
