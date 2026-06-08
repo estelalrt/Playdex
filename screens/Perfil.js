@@ -15,7 +15,6 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native"; 
 
 export default function Perfil() {
   const route = useRoute(); 
