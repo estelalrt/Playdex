@@ -117,218 +117,224 @@ export default function Home() {
   };
 
   return (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={
-        <RefreshControl 
-          refreshing={refreshing} 
-          onRefresh={onRefresh} 
-          tintColor="#5012FF" 
-          colors={["#5012FF"]} 
-        />
-      }
-    >
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/logos/Logo.png")}
-          style={styles.logo}
-        />
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar..."
-            placeholderTextColor="#6F6F6F"
-            value={search}
-            onChangeText={setSearch}
+    <View style={styles.wrapper}>
+      <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor="#5012FF" 
+            colors={["#5012FF"]} 
           />
+        }
+      >
+        <View style={styles.header}>
           <Image
-            source={require("../assets/icons/search.png")}
-            style={styles.searchIcon}
+            source={require("../assets/logos/Logo.png")}
+            style={styles.logo}
           />
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar..."
+              placeholderTextColor="#6F6F6F"
+              value={search}
+              onChangeText={setSearch}
+            />
+            <Image
+              source={require("../assets/icons/search.png")}
+              style={styles.searchIcon}
+            />
+          </View>
         </View>
-      </View>
 
-      {search.trim().length > 0 ? (
-        <View style={styles.resultadosContainer}>
-          <Text style={styles.sectionTitle}>Resultados para "{search}"</Text>
-          
-          {buscando ? (
-            <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
-          ) : (
-            <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 10 }}>
-              
-              {/* RENDERIZAÇÃO DOS USUÁRIOS */}
-              {resultadosUsuarios.length > 0 && (
-                <>
-                  <Text style={styles.subTituloBusca}>Perfis</Text>
-                  {resultadosUsuarios.map((user, idx) => (
-                    <TouchableOpacity 
-                      key={`user-${idx}`} 
-                      style={styles.cardBusca}
-                      onPress={() => {
-                        setSearch(""); 
-                        navigation.push("PerfilAmigo", { username: user.username });
-                      }}
-                    >
-                      <Image 
-                        source={{ uri: user.foto_perfil || "https://github.com/github.png" }} 
-                        style={styles.fotoPerfilBusca} 
+        {search.trim().length > 0 ? (
+          <View style={styles.resultadosContainer}>
+            <Text style={styles.sectionTitle}>Resultados para "{search}"</Text>
+            
+            {buscando ? (
+              <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 10 }}>
+                
+                {/* RENDERIZAÇÃO DOS USUÁRIOS */}
+                {resultadosUsuarios.length > 0 && (
+                  <>
+                    <Text style={styles.subTituloBusca}>Perfis</Text>
+                    {resultadosUsuarios.map((user, idx) => (
+                      <TouchableOpacity 
+                        key={`user-${idx}`} 
+                        style={styles.cardBusca}
+                        onPress={() => {
+                          setSearch(""); 
+                          navigation.push("PerfilAmigo", { username: user.username });
+                        }}
+                      >
+                        <Image 
+                          source={{ uri: user.foto_perfil || "https://github.com/github.png" }} 
+                          style={styles.fotoPerfilBusca} 
+                        />
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.tituloBusca}>{user.nome}</Text>
+                          <Text style={styles.textoArroba}>@{user.username}</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+                      </TouchableOpacity>
+                    ))}
+                  </>
+                )}
+
+                {/* RENDERIZAÇÃO DOS JOGOS */}
+                {resultadosBusca.length > 0 && (
+                  <>
+                    <Text style={[styles.subTituloBusca, { marginTop: resultadosUsuarios.length > 0 ? 20 : 0 }]}>Jogos</Text>
+                    {resultadosBusca.map((item) => (
+                      <TouchableOpacity 
+                        key={`game-${item.id}`} 
+                        style={styles.cardBusca}
+                        onPress={() => {
+                          setSearch(""); 
+                          navigation.navigate("DetalhesJogo", { id: item.id });
+                        }}
+                      >
+                        <Image 
+                          source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
+                          style={styles.capaBusca} 
+                        />
+                        <Text style={styles.tituloBusca}>{item.titulo}</Text>
+                        <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
+                      </TouchableOpacity>
+                    ))}
+                  </>
+                )}
+
+                {/* MENSAGEM SE NÃO ENCONTRAR NADA */}
+                {resultadosUsuarios.length === 0 && resultadosBusca.length === 0 && (
+                  <Text style={styles.textoVazio}>Nenhum jogo ou usuário encontrado com esse nome.</Text>
+                )}
+                
+                <View style={{ height: 40 }} />
+              </ScrollView>
+            )}
+          </View>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>Atividade de amigos</Text>
+            
+            {feed.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.scrollWrapper}
+                contentContainerStyle={styles.scrollContainer}
+              >
+                {feed.map((item, index) => (
+                  <View key={index} style={styles.cardItem}>
+                    
+                    <TouchableOpacity onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}>
+                      <Image
+                        source={{
+                          uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
+                        }}
+                        style={styles.game}
                       />
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.tituloBusca}>{user.nome}</Text>
-                        <Text style={styles.textoArroba}>@{user.username}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={styles.activityInfo}
+                      onPress={() => navigation.push("PerfilAmigo", { username: item.username })}
+                    >
+                      <Image
+                        source={{
+                          uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
+                        }}
+                        style={styles.player}
+                      />
+                      <View style={styles.nomeEIcone}>
+                        <Text style={styles.playerName} numberOfLines={1}>
+                          {item.username}
+                        </Text>
+                        {renderIconeStatus(item.status)}
                       </View>
-                      <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
                     </TouchableOpacity>
-                  ))}
-                </>
-              )}
+                  </View>
+                ))}
+              </ScrollView>
+            ) : (
+              <Text style={styles.textoVazio}>
+                Você ainda não adicionou amigos ou eles não possuem atividades recentes.
+              </Text>
+            )}
 
-              {/* RENDERIZAÇÃO DOS JOGOS */}
-              {resultadosBusca.length > 0 && (
-                <>
-                  <Text style={[styles.subTituloBusca, { marginTop: resultadosUsuarios.length > 0 ? 20 : 0 }]}>Jogos</Text>
-                  {resultadosBusca.map((item) => (
-                    <TouchableOpacity 
-                      key={`game-${item.id}`} 
-                      style={styles.cardBusca}
-                      onPress={() => {
-                        setSearch(""); 
-                        navigation.navigate("DetalhesJogo", { id: item.id });
-                      }}
-                    >
-                      <Image 
-                        source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
-                        style={styles.capaBusca} 
-                      />
-                      <Text style={styles.tituloBusca}>{item.titulo}</Text>
-                      <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
-                    </TouchableOpacity>
-                  ))}
-                </>
-              )}
-
-              {/* MENSAGEM SE NÃO ENCONTRAR NADA */}
-              {resultadosUsuarios.length === 0 && resultadosBusca.length === 0 && (
-                <Text style={styles.textoVazio}>Nenhum jogo ou usuário encontrado com esse nome.</Text>
-              )}
-              
-              <View style={{ height: 40 }} />
-            </ScrollView>
-          )}
-        </View>
-      ) : (
-        <>
-          <Text style={styles.sectionTitle}>Atividade de amigos</Text>
-          
-          {feed.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.scrollWrapper}
-              contentContainerStyle={styles.scrollContainer}
-            >
-              {feed.map((item, index) => (
-                <View key={index} style={styles.cardItem}>
-                  
-                  <TouchableOpacity onPress={() => navigation.navigate("DetalhesJogo", { id: item.id_jogo || item.id })}>
-                    <Image
-                      source={{
-                        uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa",
-                      }}
-                      style={styles.game}
-                    />
-                  </TouchableOpacity>
-
+            <Text style={styles.sectionTitle}>Em Alta</Text>
+            {carregandoJogos ? (
+              <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.scrollWrapper}
+                contentContainerStyle={styles.scrollContainer}
+              >
+                {jogosPopulares.map((item, index) => (
                   <TouchableOpacity 
-                    style={styles.activityInfo}
-                    onPress={() => navigation.push("PerfilAmigo", { username: item.username })}
+                    key={index} 
+                    style={styles.cardItem}
+                    onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
                   >
-                    <Image
-                      source={{
-                        uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
-                      }}
-                      style={styles.player}
-                    />
-                    <View style={styles.nomeEIcone}>
-                      <Text style={styles.playerName} numberOfLines={1}>
-                        {item.username}
-                      </Text>
-                      {renderIconeStatus(item.status)}
-                    </View>
+                    <Image source={{ uri: item.foto_capa }} style={styles.game} />
+                    <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
+                      {item.titulo}
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.textoVazio}>
-              Você ainda não adicionou amigos ou eles não possuem atividades recentes.
-            </Text>
-          )}
+                ))}
+              </ScrollView>
+            )}
 
-          <Text style={styles.sectionTitle}>Em Alta</Text>
-          {carregandoJogos ? (
-            <ActivityIndicator size="large" color="#5012FF" style={{ marginTop: 20 }} />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.scrollWrapper}
-              contentContainerStyle={styles.scrollContainer}
-            >
-              {jogosPopulares.map((item, index) => (
-                <TouchableOpacity 
-                  key={index} 
-                  style={styles.cardItem}
-                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
-                >
-                  <Image source={{ uri: item.foto_capa }} style={styles.game} />
-                  <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
-                    {item.titulo}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
-
-          <Text style={styles.sectionTitle}>Recomendados para você</Text>
-          {recomendados.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.scrollWrapper}
-              contentContainerStyle={styles.scrollContainer}
-            >
-              {recomendados.map((item, index) => (
-                <TouchableOpacity 
-                  key={index} 
-                  style={styles.cardItem}
-                  onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
-                >
-                  <Image source={{ uri: item.foto_capa }} style={styles.game} />
-                  <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
-                    {item.titulo}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.textoVazio}>
-              Adicione um jogo aos favoritos no seu Perfil para receber recomendações personalizadas!
-            </Text>
-          )}
-        </>
-      )}
-      
-      <View style={{ height: 40 }} />
-    </ScrollView>
+            <Text style={styles.sectionTitle}>Recomendados para você</Text>
+            {recomendados.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.scrollWrapper}
+                contentContainerStyle={styles.scrollContainer}
+              >
+                {recomendados.map((item, index) => (
+                  <TouchableOpacity 
+                    key={index} 
+                    style={styles.cardItem}
+                    onPress={() => navigation.navigate("DetalhesJogo", { id: item.id })}
+                  >
+                    <Image source={{ uri: item.foto_capa }} style={styles.game} />
+                    <Text style={[styles.playerName, { marginTop: 8, width: 100 }]} numberOfLines={1}>
+                      {item.titulo}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            ) : (
+              <Text style={styles.textoVazio}>
+                Adicione um jogo aos favoritos no seu Perfil para receber recomendações personalizadas!
+              </Text>
+            )}
+          </>
+        )}
+        
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
     backgroundColor: "#000000",
+  },
+  container: {
+    flex: 1,
     paddingTop: 20,
     paddingHorizontal: 24,
   },
