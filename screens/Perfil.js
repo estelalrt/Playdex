@@ -172,7 +172,7 @@ export default function Perfil() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: meuUsername,
-          id_jogo: juego.id,
+          id_jogo: jogo.id,
           posicao: slotSelecionado,
         }),
       });
