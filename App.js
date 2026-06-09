@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Importado o useState para controlar o fluxo
+import React from "react";
 import { View, StyleSheet } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,10 +11,10 @@ import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import Atividade from "./screens/Atividade";
 import Jogo from "./screens/Jogo"; 
-import OnboardingScreen from "./screens/OnboardingScreen"; 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
 
 function MainTabs() {
   return (
@@ -32,6 +32,8 @@ function MainTabs() {
         tabBarActiveTintColor: "#5012FF",
         tabBarInactiveTintColor: "#6F6F6F",
         tabBarIcon: ({ focused, color, size }) => {
+          
+          
           if (route.name === "Atividade") {
             return (
               <View style={[styles.botaoFlutuante, focused && styles.botaoFlutuanteAtivo]}>
@@ -40,6 +42,7 @@ function MainTabs() {
             );
           }
 
+          
           let iconName;
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
@@ -71,15 +74,9 @@ function MainTabs() {
 }
 
 export default function App() {
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
-
-  if (!hasSeenOnboarding) {
-    return <OnboardingScreen onFinish={() => setHasSeenOnboarding(true)} />;
-  }
-
   return (
     <NavigationContainer
-      documentTitle={{
+    documentTitle={{
         formatter: () => 'Playdex'
       }}
     >
@@ -93,10 +90,12 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="DetalhesJogo" component={Jogo} />
         <Stack.Screen name="PerfilAmigo" component={Perfil} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
 
 const styles = StyleSheet.create({
   botaoFlutuante: {
