@@ -461,8 +461,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 2,
   },
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> ae28b4b4b9a109382e74eb0aaccb882acf703e04
