@@ -15,21 +15,21 @@ const { width, height } = Dimensions.get('window');
 const slides = [
   {
     id: '1',
-    image: require('./assets/headset.png'), 
+    image: require('../assets/logos/headset.png'), 
     title: 'Novos universos',
     description: 'Descubra novos jogos e monte sua coleção pessoal',
     buttonText: 'Próximo',
   },
   {
     id: '2',
-    image: require('./assets/mic.png'),
+    image: require('../assets/logos/mic.png'), 
     title: 'Veja o que a galera tá jogando',
     description: 'Acompanhe o progresso dos seus amigos e descubra novos jogos.',
     buttonText: 'Próximo',
   },
   {
     id: '3',
-    image: require('./assets/monitor.png'),
+    image: require('../assets/logos/monitor.png'), 
     title: 'Pronto pra jogar?',
     description: '', 
     buttonText: 'Começar',
@@ -58,16 +58,15 @@ export default function OnboardingScreen({ onFinish }) {
   };
 
   if (showSplash) {
-    return (
-      <View style={styles.splashContainer}>
-        <Image source={require('./assets/logo-controle.png')} style={styles.splashLogo} />
-        <Text style={styles.splashTitle}>Playdex</Text>
-        <Text style={styles.splashSubtitle}>Descubra, jogue, conecte</Text>
-      </View>
-    );
-  }
+  return (
+    <View style={styles.splashContainer}>
+      <Image source={require('../assets/logos/Logo.png')} style={styles.splashLogo} />
+      <Text style={styles.splashTitle}>Playdex</Text>
+      <Text style={styles.splashSubtitle}>Descubra, jogue, conecte</Text>
+    </View>
+  );
+}
 
-  // Renderização de cada Card do Onboarding
   const renderSlide = ({ item }) => {
     return (
       <View style={styles.slide}>
