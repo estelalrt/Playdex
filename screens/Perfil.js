@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Perfil() {
   const route = useRoute(); 
 
-  // Estados do Perfil
+  
   const [meuUsername, setMeuUsername] = useState("");
   const [bio, setBio] = useState("");
   const [fotoUri, setFotoUri] = useState("https://github.com/github.png");
@@ -27,25 +27,25 @@ export default function Perfil() {
   const [tempBio, setTempBio] = useState("");
   const navigation = useNavigation();
 
-  // NOVOS ESTADOS PARA REDE SOCIAL
+  
   const [seguidores, setSeguidores] = useState(0);
   const [seguindo, setSeguindo] = useState(0);
   const [estouSeguindo, setEstouSeguindo] = useState(false); 
 
-  // O username de quem estamos vendo (pode ser você ou um amigo)
+  
   const perfilVisitado = route.params?.username || meuUsername;
 
-  // Estados dos Favoritos (Prateleira)
+  
   const [favoritos, setFavoritos] = useState([null, null, null, null]);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [slotSelecionado, setSlotSelecionado] = useState(null);
   const [query, setQuery] = useState("");
   const [sugestoes, setSugestoes] = useState([]);
 
-  // Estado do Diário de Atividades
+  
   const [diario, setDiario] = useState([]);
 
-  // URL BASE DO BACKEND
+  
   const URL_BASE = "https://playdex-yh18.onrender.com";
 
   useFocusEffect(
@@ -56,10 +56,10 @@ export default function Perfil() {
           if (!usuarioSalvo) return;
           setMeuUsername(usuarioSalvo);
 
-          // Define quem é o alvo da busca (Você ou o Amigo)
+          
           const alvoBusca = route.params?.username || usuarioSalvo;
 
-          // 1. Busca Bio e Foto do ALVO
+          
           const resPerfil = await fetch(`${URL_BASE}/perfil/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -72,7 +72,7 @@ export default function Perfil() {
             }
           }
 
-          // 2. Busca Favoritos do ALVO
+          
           const resFav = await fetch(`${URL_BASE}/favoritos/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -83,7 +83,7 @@ export default function Perfil() {
             setFavoritos(novosFavs);
           }
 
-          // 3. Busca o Diário do ALVO
+          
           const resDiario = await fetch(`${URL_BASE}/atividades/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -91,20 +91,20 @@ export default function Perfil() {
             setDiario(await resDiario.json());
           }
 
-          // 4. Busca a contagem de Seguidores do ALVO
-          // 4. Busca a contagem de Seguidores do ALVO
+          
+          
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
           if (resRede.ok) {
             const dadosRede = await resRede.json();
-            setSeguidores(dadosRede.followers || 0); // Mudou para followers
-            setSeguindo(dadosRede.following || 0);   // Mudou para following
+            setSeguidores(dadosRede.followers || 0); 
+            setSeguindo(dadosRede.following || 0);   
           }
 
           if (alvoBusca !== usuarioSalvo) {
             const resSegue = await fetch(`${URL_BASE}/verificar-seguir/${usuarioSalvo}/${alvoBusca}`);
             if (resSegue.ok) {
               const dadosSegue = await resSegue.json();
-              setEstouSeguindo(dadosSegue.segue); // O botão vai ficar roxo ou cinza automaticamente!
+              setEstouSeguindo(dadosSegue.segue); 
             }
           }
 
@@ -117,7 +117,7 @@ export default function Perfil() {
     }, [route.params?.username]) 
   );
 
-  // NOVA FUNÇÃO: SEGUIR USUÁRIO
+  
   const handleSeguir = async () => {
     try {
       const endpoint = estouSeguindo ? "/unfollow" : "/seguir";
@@ -133,7 +133,7 @@ export default function Perfil() {
 
       if (resposta.ok) {
         setEstouSeguindo(!estouSeguindo);
-        // O Math.max obriga o número a ser no mínimo 0, evitando o -1!
+        
         setSeguidores(prev => Math.max(0, estouSeguindo ? prev - 1 : prev + 1));
       }
     } catch (erro) {
@@ -142,7 +142,7 @@ export default function Perfil() {
   };
 
   const abrirPesquisa = (index) => {
-    // Só deixa pesquisar se for o seu próprio perfil
+    
     if (perfilVisitado === meuUsername) {
         setSlotSelecionado(index);
         setModalVisivel(true);
@@ -199,7 +199,7 @@ export default function Perfil() {
   };
 
   const escolherFoto = async () => {
-    // Só deixa trocar foto se for o seu próprio perfil
+    
     if (perfilVisitado !== meuUsername) return;
 
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between", // Alterado para os itens ficarem separados
+    justifyContent: "space-between", 
     marginTop: 20,
   },
   headerEsquerda: {
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   profilepic: {
-    width: 60, // Aumentei um tiquinho para dar destaque
+    width: 60, 
     height: 60,
     borderRadius: 30,
     resizeMode: "cover",

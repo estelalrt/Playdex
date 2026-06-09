@@ -18,19 +18,19 @@ export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState(""); // <-- Sua variável se chama password!
+  const [password, setPassword] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
   const handleRegister = async () => {
-    // 1. Verifica se tudo está preenchido (só precisamos de um IF para isso)
+    
     if (!nome || !email || !username || !password) {
       Alert.alert("Erro", "Preencha todos os campos!");
       return;
     }
 
-    // --- NOVA TRAVA DE SEGURANÇA DA SENHA ---
-    // Usamos a variável 'password' aqui para testar com Regex
+    
+    
     const temLetra = /[a-zA-Z]/.test(password); 
     const temNumero = /[0-9]/.test(password);   
 
@@ -41,7 +41,7 @@ export default function Cadastro() {
       );
       return;
     }
-    // --- FIM DA TRAVA DE SEGURANÇA ---
+    
 
     setCarregando(true);
 

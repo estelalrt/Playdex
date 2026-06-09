@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 
-// Agora usamos process.env.DATABASE_URL para proteger a sua senha!
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -185,7 +185,7 @@ class UsuarioDAO {
         return resultado.rows[0];
     }
 
-    // --- CORRIGIDO: Removidas as vírgulas intrusas entre os métodos da classe ---
+    
     async seguirUsuario(seguidorUsername, seguidoUsername) {
         const sql = `
             INSERT INTO seguidores (id_seguidor, id_seguido) 
@@ -232,11 +232,11 @@ class UsuarioDAO {
               AND id_seguido = (SELECT id FROM usuario WHERE username = $2)
         `;
         const resultado = await pool.query(sql, [seguidorUsername, seguidoUsername]);
-        // Se a lista for maior que zero, retorna TRUE (já segue). Senão, FALSE.
+        
         return resultado.rows.length > 0;
     }
 
-    // Adicione isso dentro da classe UsuarioDAO
+    
     async buscarUsuariosPorNome(pesquisa) {
         const sql = `
             SELECT username, nome, foto_perfil 

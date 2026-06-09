@@ -20,7 +20,7 @@ export default function Login() {
   const [carregando, setCarregando] = useState(false);
   const navigation = useNavigation();
 
-  // --- A NOSSA BUZINA BLINDADA (Funciona 100% no Web e no Celular) ---
+  
   const dispararAlerta = (titulo, mensagem) => {
     if (Platform.OS === 'web') {
       window.alert(`${titulo}\n\n${mensagem}`);
@@ -44,7 +44,7 @@ export default function Login() {
         body: JSON.stringify({ email, senha })
       });
 
-      // Proteção: tenta ler o JSON, mas se o servidor não mandar nada, não quebra o app!
+      
       let dados = {};
       try {
         dados = await resposta.json();
@@ -53,11 +53,11 @@ export default function Login() {
       }
 
       if (resposta.ok) {
-        // Salva o username no aparelho para o app saber quem está logado
+        
         await AsyncStorage.setItem("usuarioLogado", dados.usuario?.username || email);
         navigation.navigate("MainTabs");
       } else {
-        // Mostra o erro exato que o servidor mandou (ou um genérico)
+        
         dispararAlerta("Ops!", dados.erro || "E-mail ou senha incorretos.");
       }
     } catch (erro) {
@@ -79,7 +79,7 @@ export default function Login() {
           placeholderTextColor="#6F6F6F"
           value={email}
           onChangeText={setEmail}
-          autoCapitalize="none" // Evita que a primeira letra fique maiúscula sozinha
+          autoCapitalize="none" 
         />
       </View>
 
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: "#FFFFFF",
     fontSize: 16,
-    outlineStyle: 'none', // <--- ADEUS BORDA LARANJA!
+    outlineStyle: 'none', 
   },
   passwordWrapper: {
     width: "100%",

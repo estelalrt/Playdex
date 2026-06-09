@@ -20,13 +20,13 @@ export default function Home() {
   const [jogosPopulares, setJogosPopulares] = useState([]);
   const [carregandoJogos, setCarregandoJogos] = useState(true);
   const [recomendados, setRecomendados] = useState([]);
-  const [resultadosBusca, setResultadosBusca] = useState([]); // Jogos
-  const [resultadosUsuarios, setResultadosUsuarios] = useState([]); // Usuários
+  const [resultadosBusca, setResultadosBusca] = useState([]); 
+  const [resultadosUsuarios, setResultadosUsuarios] = useState([]); 
   const [buscando, setBuscando] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  // FUNÇÃO ÚNICA PARA CARREGAR TODOS OS DADOS DA HOME
+  
   const carregarHome = async () => {
     try {
       const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
@@ -59,21 +59,21 @@ export default function Home() {
     }
   };
 
-  // ATUALIZA A TELA SEMPRE QUE VOCÊ NAVEGA PARA ELA
+  
   useFocusEffect(
     useCallback(() => {
       carregarHome();
     }, [])
   );
 
-  // FUNÇÃO DO "PUXAR PARA ATUALIZAR"
+  
   const onRefresh = async () => {
     setRefreshing(true);
     await carregarHome();
     setRefreshing(false);
   };
 
-  // EFEITO DE BUSCA PARA JOGOS E USUÁRIOS
+  
   useEffect(() => {
     if (search.trim() === "") {
       setResultadosBusca([]);
@@ -157,7 +157,7 @@ export default function Home() {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 10 }}>
               
-              {/* RENDERIZAÇÃO DOS USUÁRIOS */}
+              {}
               {resultadosUsuarios.length > 0 && (
                 <>
                   <Text style={styles.subTituloBusca}>Perfis</Text>
@@ -198,7 +198,7 @@ export default function Home() {
                       }}
                     >
                       <Image 
-                        source={{ uri: item.foto_capa || "https://placehold.co/100x135/1C1C1C/FFFFFF/png?text=Sem+Capa" }} 
+                        source={{ uri: item.foto_capa || "https:
                         style={styles.capaBusca} 
                       />
                       <Text style={styles.tituloBusca}>{item.titulo}</Text>
@@ -208,7 +208,7 @@ export default function Home() {
                 </>
               )}
 
-              {/* MENSAGEM SE NÃO ENCONTRAR NADA */}
+              {}
               {resultadosUsuarios.length === 0 && resultadosBusca.length === 0 && (
                 <Text style={styles.textoVazio}>Nenhum jogo ou usuário encontrado com esse nome.</Text>
               )}
@@ -246,7 +246,7 @@ export default function Home() {
                   >
                     <Image
                       source={{
-                        uri: item.foto_perfil || "https://ui-avatars.com/api/?name=Amigo&background=0D8ABC&color=fff",
+                        uri: item.foto_perfil || "https:
                       }}
                       style={styles.player}
                     />

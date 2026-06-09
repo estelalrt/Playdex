@@ -1,4 +1,4 @@
-const UsuarioDAO = require('../dao/UsuarioDAO'); // Verifique se o caminho da pasta está certo no seu projeto
+const UsuarioDAO = require('../dao/UsuarioDAO'); 
 
 class UsuarioController {
   async login(req, res) {
@@ -163,7 +163,7 @@ class UsuarioController {
         }
   }
 
-  // --- NOVAS FUNÇÕES DE REDE SOCIAL AQUI! ---
+  
   async seguir(req, res) {
       try {
           const { seguidor, seguido } = req.body;
@@ -211,12 +211,12 @@ class UsuarioController {
       }
   }
 
-  // Adicione isso dentro da classe UsuarioController
+  
   async buscarUsuarios(req, res) {
       try {
           const queryPesquisa = req.query.q; 
           if (!queryPesquisa) {
-              return res.json([]); // Retorna array vazio se não digitar nada
+              return res.json([]); 
           }
           
           const usuarios = await UsuarioDAO.buscarUsuariosPorNome(queryPesquisa);

@@ -28,7 +28,7 @@ export default function Atividade() {
   const [review, setReview] = useState("");
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
   
-  // <-- JÁ INICIA COM A DATA DE HOJE AUTOMATICAMENTE!
+  
   const [data, setData] = useState(() => {
     const hoje = new Date();
     const dia = String(hoje.getDate()).padStart(2, '0');
@@ -86,17 +86,17 @@ export default function Atividade() {
       return;
     }
 
-    // --- NOVA TRAVA DE SEGURANÇA DA DATA ---
+    
     const partesData = data.split('/');
     const dia = parseInt(partesData[0], 10);
     const mes = parseInt(partesData[1], 10);
     const ano = parseInt(partesData[2], 10);
 
-    // O JavaScript cria a data. Se passarmos 30 de fevereiro, ele avança para março sozinho.
+    
     const dataDigitada = new Date(ano, mes - 1, dia); 
     const dataDeHoje = new Date();
 
-    // Comparamos o que o usuário digitou com o que o JS interpretou para pegar datas falsas
+    
     if (
       dataDigitada.getFullYear() !== ano ||
       dataDigitada.getMonth() !== mes - 1 ||
@@ -106,16 +106,16 @@ export default function Atividade() {
       return;
     }
 
-    // Barra atividades no futuro
+    
     if (dataDigitada > dataDeHoje) {
       Alert.alert("Viajante do Tempo?", "Você não pode registrar uma atividade no futuro!");
       return;
     }
-    // --- FIM DA TRAVA DE SEGURANÇA ---
+    
 
     try {
       const usuarioLogado = await AsyncStorage.getItem("usuarioLogado");
-      // ... (O RESTO DO SEU CÓDIGO CONTINUA IGUAL DAQUI PRA BAIXO) ...
+      
 
       let dataBanco = data;
       if (data.includes('/')) {
@@ -167,7 +167,7 @@ export default function Atividade() {
         style={[styles.botaoStatus, isAtivo && styles.botaoStatusAtivo]}
         onPress={() => {
           setStatus(nome);
-          if (nome !== "Concluído") setNota(0); // Só guarda nota se for Concluído
+          if (nome !== "Concluído") setNota(0); 
           if (nome === "Quero Jogar") {
              setReview(""); 
              setDuracao("");
@@ -330,7 +330,6 @@ export default function Atividade() {
           </View>
         </View>
 
-        {/* <-- SÓ MOSTRA ESTRELAS SE FOR CONCLUÍDO */}
         {status === "Concluído" && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Avaliação</Text>
@@ -338,7 +337,6 @@ export default function Atividade() {
           </View>
         )}
 
-        {/* <-- ESCONDE O TEMPO JOGADO SE FOR QUERO JOGAR */}
         {status !== "Quero Jogar" && (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Tempo Jogado</Text>

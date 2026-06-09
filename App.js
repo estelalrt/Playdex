@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react"; // Importado o useState para controlar o fluxo
 import { View, StyleSheet } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,10 +11,10 @@ import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import Atividade from "./screens/Atividade";
 import Jogo from "./screens/Jogo"; 
+import OnboardingScreen from "./screens/OnboardingScreen"; 
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 function MainTabs() {
   return (
@@ -32,8 +32,6 @@ function MainTabs() {
         tabBarActiveTintColor: "#5012FF",
         tabBarInactiveTintColor: "#6F6F6F",
         tabBarIcon: ({ focused, color, size }) => {
-          
-          // O botão especial da Atividade fica no meio
           if (route.name === "Atividade") {
             return (
               <View style={[styles.botaoFlutuante, focused && styles.botaoFlutuanteAtivo]}>
@@ -42,7 +40,6 @@ function MainTabs() {
             );
           }
 
-          // Ícones normais para Home e Perfil
           let iconName;
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
@@ -74,10 +71,16 @@ function MainTabs() {
 }
 
 export default function App() {
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+
+  if (!hasSeenOnboarding) {
+    return <OnboardingScreen onFinish={() => setHasSeenOnboarding(true)} />;
+  }
+
   return (
     <NavigationContainer
-    documentTitle={{
-        formatter: () => 'Playdex' // <--- ISSO AQUI FORÇA O NOME DA ABA!
+      documentTitle={{
+        formatter: () => 'Playdex'
       }}
     >
       <Stack.Navigator
@@ -90,29 +93,27 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="DetalhesJogo" component={Jogo} />
         <Stack.Screen name="PerfilAmigo" component={Perfil} />
-        
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-// Estilos para o nosso botão flutuante
 const styles = StyleSheet.create({
   botaoFlutuante: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#5012FF", // Seu roxo oficial!
+    backgroundColor: "#5012FF", 
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 30, // Isso empurra ele pra fora da barra
+    marginBottom: 30, 
     shadowColor: "#5012FF",
     shadowOpacity: 0.4,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 5,
-    elevation: 5, // Sombra para Android
+    elevation: 5, 
   },
   botaoFlutuanteAtivo: {
-    backgroundColor: "#5619ff", // Um pouquinho mais claro se estiver clicado
+    backgroundColor: "#5619ff", 
   },
 });

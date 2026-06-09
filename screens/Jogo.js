@@ -64,7 +64,7 @@ export default function Jogo() {
     <View style={styles.container}>
       <ScrollView bounces={false} style={{ flex: 1 }}>
         
-        {/* CONTAINER DA IMAGEM (Fica no fundo de tudo) */}
+        {}
         <View style={styles.headerImageContainer}>
           <Image 
             source={{ uri: jogo.foto_fundo || jogo.foto_capa }} 
@@ -73,7 +73,6 @@ export default function Jogo() {
           />
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.6)', '#000000']}
-            // Aos 85% da imagem, ela já vira preto absoluto, matando a borda da foto!
             locations={[0, 0.5, 0.85]} 
             style={StyleSheet.absoluteFillObject}
           />
@@ -86,7 +85,6 @@ export default function Jogo() {
           </TouchableOpacity>
         </View>
         
-        {/* CONTAINER DE CONTEÚDO (Fundo totalmente preto que continua pro resto da tela) */}
         <View style={styles.containerInferior}>
            <Text style={styles.titulo}>{jogo.titulo}</Text>
            
