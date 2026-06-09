@@ -83,9 +83,9 @@ export default function Perfil() {
             headers: { Accept: "application/json" },
           });
           if (resDiario.ok) {
-            setDiario(await resDiario.json());
-            console.log("DEBUG DIÁRIO:", dadosDiario);
-            setDiario(dadosDiario);
+            const dadosDoBanco = await resDiario.json();
+            console.log("DEBUG DIÁRIO:", dadosDoBanco); 
+            setDiario(dadosDoBanco);
           }
 
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
