@@ -6,11 +6,9 @@ import {
   Image, 
   FlatList, 
   TouchableOpacity, 
-  Dimensions, 
+  useWindowDimensions, // 1. Importe o hook aqui
   SafeAreaView 
 } from 'react-native';
-
-const { width } = Dimensions.get('window');
 
 const slides = [
   {
@@ -41,6 +39,9 @@ export default function OnboardingScreen({ onFinish }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
 
+  // 2. Pegue a largura e altura dinâmicas aqui de dentro do componente
+  const { width, height } = useWindowDimensions();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -69,7 +70,8 @@ export default function OnboardingScreen({ onFinish }) {
 
   const renderSlide = ({ item }) => {
     return (
-      <View style={styles.slide}>
+      // 3. Aplique a largura e a altura dinâmicas direto na View do slide
+      <View style={[styles.slide, { width, height }]}>
         <View style={styles.imageContainer}>
           <Image source={item.image} style={styles.slideImage} resizeMode="contain" />
         </View>
@@ -97,8 +99,7 @@ export default function OnboardingScreen({ onFinish }) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        style={styles.flatList} // Adicionado estilo na lista
-        contentContainerStyle={styles.flatListContent} // Garante o crescimento interno na Web
+        style={styles.flatList} 
         onMomentumScrollEnd={(e) => {
           const contentOffsetX = e.nativeEvent.contentOffset.x;
           const index = Math.round(contentOffsetX / width);
@@ -120,7 +121,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%', // Força altura total na Web
   },
   splashLogo: {
     width: 120,
@@ -140,14 +140,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   flatList: {
-    flex: 1, // Força a lista a esticar e ocupar o espaço do container
-  },
-  flatListContent: {
-    flexGrow: 1,
+    flex: 1, 
   },
   slide: {
-    width: width,
-    height: '100%', // Mudado de estável para '100%' para acompanhar a FlatList na Web
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 60,
