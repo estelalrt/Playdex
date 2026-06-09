@@ -10,26 +10,26 @@ import {
   SafeAreaView 
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const slides = [
   {
     id: '1',
-    image: require('../assets/logos/headset.png'), 
+    image: require('../assets/logos/headset.png'),
     title: 'Novos universos',
     description: 'Descubra novos jogos e monte sua coleção pessoal',
     buttonText: 'Próximo',
   },
   {
     id: '2',
-    image: require('../assets/logos/mic.png'), 
+    image: require('../assets/logos/mic.png'),
     title: 'Veja o que a galera tá jogando',
     description: 'Acompanhe o progresso dos seus amigos e descubra novos jogos.',
     buttonText: 'Próximo',
   },
   {
     id: '3',
-    image: require('../assets/logos/monitor.png'), 
+    image: require('../assets/logos/monitor.png'),
     title: 'Pronto pra jogar?',
     description: '', 
     buttonText: 'Começar',
@@ -58,14 +58,14 @@ export default function OnboardingScreen({ onFinish }) {
   };
 
   if (showSplash) {
-  return (
-    <View style={styles.splashContainer}>
-      <Image source={require('../assets/logos/Logo.png')} style={styles.splashLogo} />
-      <Text style={styles.splashTitle}>Playdex</Text>
-      <Text style={styles.splashSubtitle}>Descubra, jogue, conecte</Text>
-    </View>
-  );
-}
+    return (
+      <View style={styles.splashContainer}>
+        <Image source={require('../assets/logos/Logo.png')} style={styles.splashLogo} />
+        <Text style={styles.splashTitle}>Playdex</Text>
+        <Text style={styles.splashSubtitle}>Descubra, jogue, conecte</Text>
+      </View>
+    );
+  }
 
   const renderSlide = ({ item }) => {
     return (
@@ -97,6 +97,8 @@ export default function OnboardingScreen({ onFinish }) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        style={styles.flatList} // Adicionado estilo na lista
+        contentContainerStyle={styles.flatListContent} // Garante o crescimento interno na Web
         onMomentumScrollEnd={(e) => {
           const contentOffsetX = e.nativeEvent.contentOffset.x;
           const index = Math.round(contentOffsetX / width);
@@ -118,6 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
+    height: '100%', // Força altura total na Web
   },
   splashLogo: {
     width: 120,
@@ -136,9 +139,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
+  flatList: {
+    flex: 1, // Força a lista a esticar e ocupar o espaço do container
+  },
+  flatListContent: {
+    flexGrow: 1,
+  },
   slide: {
     width: width,
-    height: height,
+    height: '100%', // Mudado de estável para '100%' para acompanhar a FlatList na Web
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 60,
@@ -149,8 +158,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   slideImage: {
-    width: width * 0.45,
-    height: width * 0.45,
+    width: 180,
+    height: 180,
   },
   textContainer: {
     alignItems: 'center',
@@ -177,8 +186,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    backgroundColor: '#5616FF', 
-    width: width * 0.45,
+    backgroundColor: '#5012FF', 
+    width: 180,
     paddingVertical: 14,
     borderRadius: 25,
     alignItems: 'center',
