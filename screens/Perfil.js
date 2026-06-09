@@ -44,7 +44,7 @@ export default function Perfil() {
   const URL_BASE = "https://playdex-yh18.onrender.com";
 
   const jogosFinalizados = diario.filter(
-    (item) => item.status === "Finalizado" || item.status?.toLowerCase() === "finalizado"
+    (item) => item.status === "Concluído" || item.status?.toLowerCase() === "concluído"
   );
 
   useFocusEffect(
