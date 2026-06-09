@@ -84,6 +84,8 @@ export default function Perfil() {
           });
           if (resDiario.ok) {
             setDiario(await resDiario.json());
+            console.log("DEBUG DIÁRIO:", dadosDiario);
+            setDiario(dadosDiario);
           }
 
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
