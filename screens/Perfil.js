@@ -18,35 +18,34 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function Perfil() {
   const route = useRoute(); 
+  const navigation = useNavigation();
 
-  
   const [meuUsername, setMeuUsername] = useState("");
   const [bio, setBio] = useState("");
   const [fotoUri, setFotoUri] = useState("https://github.com/github.png");
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState("");
-  const navigation = useNavigation();
 
-  
   const [seguidores, setSeguidores] = useState(0);
   const [seguindo, setSeguindo] = useState(0);
   const [estouSeguindo, setEstouSeguindo] = useState(false); 
 
-  
   const perfilVisitado = route.params?.username || meuUsername;
 
-  
   const [favoritos, setFavoritos] = useState([null, null, null, null]);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [slotSelecionado, setSlotSelecionado] = useState(null);
   const [query, setQuery] = useState("");
   const [sugestoes, setSugestoes] = useState([]);
 
-  
   const [diario, setDiario] = useState([]);
+  const [modalBibliotecaVisivel, setModalBibliotecaVisivel] = useState(false);
 
-  
   const URL_BASE = "https://playdex-yh18.onrender.com";
+
+  const jogosFinalizados = diario.filter(
+    (item) => item.status === "Finalizado" || item.status?.toLowerCase() === "finalizado"
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -56,10 +55,8 @@ export default function Perfil() {
           if (!usuarioSalvo) return;
           setMeuUsername(usuarioSalvo);
 
-          
           const alvoBusca = route.params?.username || usuarioSalvo;
 
-          
           const resPerfil = await fetch(`${URL_BASE}/perfil/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -72,7 +69,6 @@ export default function Perfil() {
             }
           }
 
-          
           const resFav = await fetch(`${URL_BASE}/favoritos/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -83,7 +79,6 @@ export default function Perfil() {
             setFavoritos(novosFavs);
           }
 
-          
           const resDiario = await fetch(`${URL_BASE}/atividades/${alvoBusca}`, {
             headers: { Accept: "application/json" },
           });
@@ -91,8 +86,6 @@ export default function Perfil() {
             setDiario(await resDiario.json());
           }
 
-          
-          
           const resRede = await fetch(`${URL_BASE}/usuario/${alvoBusca}/rede`);
           if (resRede.ok) {
             const dadosRede = await resRede.json();
@@ -117,7 +110,6 @@ export default function Perfil() {
     }, [route.params?.username]) 
   );
 
-  
   const handleSeguir = async () => {
     try {
       const endpoint = estouSeguindo ? "/unfollow" : "/seguir";
@@ -133,7 +125,6 @@ export default function Perfil() {
 
       if (resposta.ok) {
         setEstouSeguindo(!estouSeguindo);
-        
         setSeguidores(prev => Math.max(0, estouSeguindo ? prev - 1 : prev + 1));
       }
     } catch (erro) {
@@ -142,7 +133,6 @@ export default function Perfil() {
   };
 
   const abrirPesquisa = (index) => {
-    
     if (perfilVisitado === meuUsername) {
         setSlotSelecionado(index);
         setModalVisivel(true);
@@ -180,7 +170,7 @@ export default function Perfil() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: meuUsername,
-          id_jogo: jogo.id,
+          id_jogo: juego.id,
           posicao: slotSelecionado,
         }),
       });
@@ -199,7 +189,6 @@ export default function Perfil() {
   };
 
   const escolherFoto = async () => {
-    
     if (perfilVisitado !== meuUsername) return;
 
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -280,7 +269,6 @@ export default function Perfil() {
     <View style={styles.wrapper}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-          
           <View style={styles.headerEsquerda}>
             {perfilVisitado !== meuUsername && (
               <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 15 }}>
@@ -294,7 +282,6 @@ export default function Perfil() {
             
             <View style={styles.headerTextos}>
               <Text style={styles.userName}>{perfilVisitado || "Visitante"}</Text>
-              
               <View style={styles.redeContainer}>
                 <Text style={styles.redeTexto}><Text style={styles.redeNumero}>{seguidores}</Text> Seguidores</Text>
                 <Text style={styles.redeTexto}><Text style={styles.redeNumero}>{seguindo}</Text> Seguindo</Text>
@@ -314,7 +301,6 @@ export default function Perfil() {
           ) : (
              <Ionicons name="settings-outline" size={24} color="#6F6F6F" />
           )}
-
         </View>
 
         <View style={styles.bioHeader}>
@@ -402,7 +388,7 @@ export default function Perfil() {
         </View>
 
         <View style={styles.secaoLinks}>
-          <TouchableOpacity style={styles.linkRow}>
+          <TouchableOpacity style={styles.linkRow} onPress={() => setModalBibliotecaVisivel(true)}>
             <Text style={styles.linkText}>Sua biblioteca</Text>
             <Ionicons name="chevron-forward" size={20} color="#6F6F6F" />
           </TouchableOpacity>
@@ -449,6 +435,36 @@ export default function Perfil() {
                 <Text style={styles.textoSugestao}>{item.titulo}</Text>
               </TouchableOpacity>
             ))}
+          </ScrollView>
+        </View>
+      </Modal>
+
+      <Modal visible={modalBibliotecaVisivel} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitulo}>Sua Biblioteca ({jogosFinalizados.length})</Text>
+            <TouchableOpacity onPress={() => setModalBibliotecaVisivel(false)}>
+              <Ionicons name="close" size={28} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.gridBiblioteca}>
+            {jogosFinalizados.length === 0 ? (
+              <Text style={styles.textoVazio}>Você ainda não marcou nenhum jogo como finalizado.</Text>
+            ) : (
+              jogosFinalizados.map((item, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.itemBiblioteca}
+                  onPress={() => setModalBibliotecaVisivel(false)}
+                >
+                  <Image source={{ uri: item.jogo_capa }} style={styles.capaBiblioteca} />
+                  <Text style={styles.tituloJogoBiblioteca} numberOfLines={2}>
+                    {item.jogo_titulo}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         </View>
       </Modal>
@@ -709,5 +725,33 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "500",
+  },
+  gridBiblioteca: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    paddingBottom: 40,
+  },
+  itemBiblioteca: {
+    width: "30%",
+    marginBottom: 20,
+    marginHorizontal: "1.6%",
+    alignItems: "center",
+  },
+  capaBiblioteca: {
+    width: "100%",
+    height: 130,
+    borderRadius: 8,
+    backgroundColor: "#1C1C1C",
+    resizeMode: "cover",
+    borderWidth: 1,
+    borderColor: "#2A2A2A",
+  },
+  tituloJogoBiblioteca: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "500",
+    textAlign: "center",
+    marginTop: 6,
   },
 });
